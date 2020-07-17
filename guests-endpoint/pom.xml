@@ -32,7 +32,7 @@
         REST endpoint classes for the CityTeam Guests application.
         Integration APIs are part of the guests-client module.
         Integration tests are in the separate
-        city-team-guests-client-test project.
+        cityteam-guests-client-test project.
     </description>
 
     <!-- Build Configuration -->

@@ -99,7 +99,7 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
             throws InternalServerError {
 
         Response response = facilityTarget
-                .path("name")
+                .path("/name")
                 .path(name)
                 .request(MediaType.APPLICATION_JSON)
                 .get();
@@ -107,6 +107,24 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
             return response.readEntity(
                         new GenericType<List<Facility>>() {}
                     );
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    public @NotNull Facility findByNameExact(@NotNull String name)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path("/nameExact")
+                .path(name)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(Facility.class);
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
         } else {
             throw new InternalServerError(response.readEntity(String.class));
         }

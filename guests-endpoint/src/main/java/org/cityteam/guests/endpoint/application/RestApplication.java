@@ -34,7 +34,7 @@ import javax.ws.rs.core.Application;
                         name = "Apache License 2.0",
                         url = "http://apache.org/licenses/LICENSE-2.0"
                 ),
-                title = "CityTeam Guests Application API",
+                title = "CityTeam Guests Application REST APIs",
                 version = "1.0.0-SNAPSHOT"
         )
 )

@@ -211,6 +211,48 @@ public class FacilityEndpoints {
         }
     }
 
+    @GET
+    @Path("/nameExact/{name}")
+    @Operation(description = "Find facilities matching an exact name.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Facility.class)
+                    ),
+                    description = "The found facilities.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing facility message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findByNameExact(
+            @Parameter(description = "Name matching facility to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(facilityService.findByNameExact(name)).build();
+        } catch (InternalServerError e) {
+            LOG.log(SEVERE, "findByNameExact(): " + e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
     @POST
     @Operation(description = "Insert a new facility.")
     @APIResponses(value = {
