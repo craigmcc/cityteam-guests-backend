@@ -19,8 +19,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static org.cityteam.guests.model.Constants.GUESTS_COLUMN;
-import static org.cityteam.guests.model.Facility.NameComparator;
+import static org.cityteam.guests.model.Constants.FACILITY_COLUMN;
+import static org.cityteam.guests.model.Guest.NameComparator;
 import static org.craigmcc.library.model.Constants.PUBLISHED_COLUMN;
 import static org.craigmcc.library.model.Constants.UPDATED_COLUMN;
 import static org.craigmcc.library.model.Constants.VERSION_COLUMN;
@@ -32,20 +32,23 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 
 @Category(UnitTests.class)
-public class FacilityUnitTest {
+public class GuestUnitTest {
 
-    private Facility facility = new Facility();
+    private Guest guest = new Guest();
 
     @Test
     public void equalsVerifier() {
 
-        EqualsVerifier.forClass(Facility.class)
+        EqualsVerifier.forClass(Guest.class)
                 .usingGetClass()
                 .withIgnoredFields(PUBLISHED_COLUMN, UPDATED_COLUMN,
-                        VERSION_COLUMN, GUESTS_COLUMN)
-                .withPrefabValues(Guest.class,
-                        new Guest(null, 1L, "Foo", "Bar"),
-                        new Guest(null, 2L, "Baz", "Bop"))
+                        VERSION_COLUMN, FACILITY_COLUMN)
+                .withPrefabValues(Facility.class,
+                        new Facility(null, null, null, null, "First",
+                                null, null, null),
+                        new Facility(null, null, null, null, "Second",
+                                null, null, null)
+                        )
                 .withRedefinedSuperclass()
                 .verify();
 
@@ -54,54 +57,59 @@ public class FacilityUnitTest {
     @Test
     public void matchNameNegative() {
 
-        facility.setName("Foo Bar");
+        guest.setFirstName("Foo");
+        guest.setLastName("Bar");
 
-        assertThat(facility.matchName("Baz"), not(true));
-        assertThat(facility.matchName("baz"), not(true));
-        assertThat(facility.matchName("BAZ"), not(true));
-        assertThat(facility.matchName(" "), not(true));
-        assertThat(facility.matchName(""), not(true));
-        assertThat(facility.matchName(null), not(true));
+        assertThat(guest.matchNames("Baz"), not(true));
+        assertThat(guest.matchNames("baz"), not(true));
+        assertThat(guest.matchNames("BAZ"), not(true));
+        assertThat(guest.matchNames(" "), not(true));
+        assertThat(guest.matchNames(""), not(true));
+        assertThat(guest.matchNames(null), not(true));
 
     }
 
     @Test
     public void matchNamePositive() {
 
-        facility.setName("Foo Bar");
+        guest.setFirstName("Foo");
+        guest.setLastName("Bar");
 
         // Full string
-        assertThat(facility.matchName("Foo Bar"), is(true));
-        assertThat(facility.matchName("Foo bar"), is(true));
-        assertThat(facility.matchName("foo Bar"), is(true));
+        assertThat(guest.matchNames("Foo Bar"), is(true));
+        assertThat(guest.matchNames("Foo bar"), is(true));
+        assertThat(guest.matchNames("foo Bar"), is(true));
 
         // Prefix
-        assertThat(facility.matchName("Foo"), is(true));
-        assertThat(facility.matchName("FOo"), is(true));
-        assertThat(facility.matchName("foo"), is(true));
-        assertThat(facility.matchName("FOO"), is(true));
+        assertThat(guest.matchNames("Foo"), is(true));
+        assertThat(guest.matchNames("FOo"), is(true));
+        assertThat(guest.matchNames("foo"), is(true));
+        assertThat(guest.matchNames("FOO"), is(true));
 
         // Suffix
-        assertThat(facility.matchName("Bar"), is(true));
-        assertThat(facility.matchName("BAr"), is(true));
-        assertThat(facility.matchName("bar"), is(true));
-        assertThat(facility.matchName("BAR"), is(true));
+        assertThat(guest.matchNames("Bar"), is(true));
+        assertThat(guest.matchNames("BAr"), is(true));
+        assertThat(guest.matchNames("bar"), is(true));
+        assertThat(guest.matchNames("BAR"), is(true));
 
         // Middle
-        assertThat(facility.matchName("o B"), is(true));
-        assertThat(facility.matchName("o b"), is(true));
-        assertThat(facility.matchName("O b"), is(true));
-        assertThat(facility.matchName("O B"), is(true));
+        assertThat(guest.matchNames("o B"), is(true));
+        assertThat(guest.matchNames("o b"), is(true));
+        assertThat(guest.matchNames("O b"), is(true));
+        assertThat(guest.matchNames("O B"), is(true));
 
     }
 
     @Test
     public void NameComparator() {
 
-        Facility first = new Facility();
-        first.setName("Bar");
-        Facility second = new Facility();
-        second.setName("Foo");
+        Guest first = new Guest();
+        first.setFirstName("Foo");
+        first.setLastName("Bar");
+        Guest second = new Guest();
+        second.setFirstName("Baz");
+        second.setLastName("Bop");
+
 
         assertThat(NameComparator.compare(first, second), lessThan(0));
         assertThat(NameComparator.compare(first, first), comparesEqualTo(0));

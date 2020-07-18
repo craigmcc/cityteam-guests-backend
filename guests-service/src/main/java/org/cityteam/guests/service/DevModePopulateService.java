@@ -16,6 +16,7 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.model.Facility;
+import org.cityteam.guests.model.Guest;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
@@ -40,7 +41,10 @@ public class DevModePopulateService {
     private EntityManager entityManager;
 
     // Key is "name"
-    private Map<String, Facility> facilities = new HashMap<>();
+    private final Map<String, Facility> facilities = new HashMap<>();
+
+    // Key is "facilityId|lastName|firstName"
+    private final Map<String, Guest> guests = new HashMap<>();
 
     // Static Variables ------------------------------------------------------
 
@@ -53,6 +57,7 @@ public class DevModePopulateService {
         LOG.info("----- Populate Development Test Data Begin -----");
         // Populate data in order respecting dependencies
         populateFacilities();
+        populateGuests();
         // Clean up our temporary data maps
         cleanTemporaryMaps();
         LOG.info("------ Populate Development Test Data End ------");
@@ -64,16 +69,31 @@ public class DevModePopulateService {
         facilities.clear();
     }
 
-    private Long lookupFaclity(String name) {
+    private Facility lookupFacility(String name) {
         Facility facility = facilities.get(name);
         if (facility == null) {
             throw new IllegalArgumentException
-                    ("Cannot find facility for '" + name + "'");
+                    ("Cannot find facility for name '" + name + "'");
         } else if (facility.getId() == null) {
             throw new IllegalArgumentException
-                    ("No ID for facility '" + name + "'");
+                    ("No facility ID for name '" + name + "'");
         }
-        return facility.getId();
+        return facility;
+    }
+
+    private Guest lookupGuest(Long facilityId, String firstName, String lastName) {
+        Guest guest = guests.get(facilityId + "|" + lastName + "|" + firstName);
+        if (guest == null) {
+            throw new IllegalArgumentException
+                    ("Cannot find guest for facilityId " + facilityId +
+                            "and name " + firstName + " " + lastName);
+        } else if (guest.getId() == null) {
+            throw new IllegalArgumentException
+                    ("No guest ID for facilityId " + facilityId +
+                            "and name " + firstName + " " + lastName);
+
+        }
+        return guest;
     }
 
     private void populateFacility(
@@ -155,6 +175,116 @@ public class DevModePopulateService {
                 "95131"
         );
         LOG.info("Populating facilities end");
+    }
+
+    private void populateGuest(
+            String comment,
+            Long facilityId,
+            String firstName,
+            String lastName
+    ) {
+        Guest guest = new Guest(
+                comment,
+                facilityId,
+                firstName,
+                lastName
+        );
+        guest.setPublished(LocalDateTime.now());
+        guest.setUpdated(guest.getPublished());
+        entityManager.persist(guest);
+        guests.put(facilityId + "|" + lastName + "|" + firstName, guest);
+    }
+
+    private void populateGuests() {
+
+        // NOTE: Do not populate guests for facility "Oakland"
+        LOG.info("Populating guests begin");
+
+        // Populate guests for facility "Chester"
+        Long facilityId1 = lookupFacility("Chester").getId();
+        populateGuest(
+                "Chester Fred Comment",
+                facilityId1,
+                "Fred",
+                "Flintstone"
+        );
+        populateGuest(
+                "Chester Barney Comment",
+                facilityId1,
+                "Barney",
+                "Rubble"
+        );
+        populateGuest(
+                "Chester Bam Bam Comment",
+                facilityId1,
+                "Bam Bam",
+                "Rubble"
+        );
+
+        // Populate guests for facility "Portland"
+        Long facilityId2 = lookupFacility("Portland").getId();
+        populateGuest(
+                "Portland Fred Comment",
+                facilityId2,
+                "Fred",
+                "Flintstone"
+        );
+        populateGuest(
+                "Portland Barney Comment",
+                facilityId2,
+                "Barney",
+                "Rubble"
+        );
+        populateGuest(
+                "Portland Bam Bam Comment",
+                facilityId2,
+                "Bam Bam",
+                "Rubble"
+        );
+
+        // Populate guests for facility "San Francisco"
+        Long facilityId3 = lookupFacility("San Francisco").getId();
+        populateGuest(
+                "San Francisco Fred Comment",
+                facilityId3,
+                "Fred",
+                "Flintstone"
+        );
+        populateGuest(
+                "San Francisco Barney Comment",
+                facilityId3,
+                "Barney",
+                "Rubble"
+        );
+        populateGuest(
+                "San Francisco Bam Bam Comment",
+                facilityId3,
+                "Bam Bam",
+                "Rubble"
+        );
+
+        // Populate guests for facility "San Jose"
+        Long facilityId4 = lookupFacility("San Jose").getId();
+        populateGuest(
+                "San Jose Fred Comment",
+                facilityId4,
+                "Fred",
+                "Flintstone"
+        );
+        populateGuest(
+                "San Jose Barney Comment",
+                facilityId4,
+                "Barney",
+                "Rubble"
+        );
+        populateGuest(
+                "San Jose Bam Bam Comment",
+                facilityId4,
+                "Bam Bam",
+                "Rubble"
+        );
+
+        LOG.info("Populating guests end");
     }
 
 }

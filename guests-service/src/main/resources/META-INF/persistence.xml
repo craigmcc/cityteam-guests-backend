@@ -24,6 +24,7 @@
     <persistence-unit name="prod">
 
         <class>org.cityteam.guests.model.Facility</class>
+        <class>org.cityteam.guests.model.Guest</class>
 
         <jta-data-source>java:jboss/datasources/GuestsDS</jta-data-source>
 

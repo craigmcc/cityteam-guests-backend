@@ -30,11 +30,27 @@ public interface Constants {
 
     String CITY_COLUMN = "city";
 
+    String COMMENTS_COLUMN = "comments";
+
     String EMAIL_COLUMN = "email";
 
+    String FACILITY_COLUMN = "facility";
+
     String FACILITY_ID_COLUMN = "facilityId";
+    String FACILITY_ID_VALIDATION_MESSAGE =
+            "facilityId: Required and must identify a valid facility";
+
+    String FIRST_NAME_COLUMN = "firstName";
+    String FIRST_NAME_VALIDATION_MESSAGE =
+            "firstName: Required and must not be blank";
 
     String GUEST_ID_COLUMN = "guestId";
+
+    String GUESTS_COLUMN = "guests";
+
+    String LAST_NAME_COLUMN = "lastName";
+    String LAST_NAME_VALIDATION_MESSAGE =
+            "lastName: Required and must not be blank";
 
     String NAME_COLUMN = "name";
     String NAME_VALIDATION_MESSAGE =

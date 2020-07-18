@@ -24,14 +24,18 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
+import java.util.List;
 
 import static org.cityteam.guests.model.Constants.FACILITY_NAME;
 import static org.cityteam.guests.model.Constants.FACILITY_TABLE;
@@ -119,16 +123,16 @@ public class Facility extends Model<Facility> implements Constants {
     @Schema(description = "Email address of this facility.")
     private String email;
 
-/*
     @OneToMany(
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY,
             mappedBy = FACILITY_ID_COLUMN,
             orphanRemoval = true
-
     )
+    @OrderBy(FACILITY_ID_COLUMN + ", " + LAST_NAME_COLUMN +
+            ", " + FIRST_NAME_COLUMN)
+    @Schema(hidden = true)
     private List<Guest> guests;
-*/
 
     @Column(
             name = NAME_COLUMN,
@@ -180,13 +184,11 @@ public class Facility extends Model<Facility> implements Constants {
     @Schema(description = "Zip code of the address for this facility.")
     private String zipCode;
 
-    // Static Variables ------------------------------------------------------
-
-    // Static Methods --------------------------------------------------------
+    // Static Classes ------------------------------------------------------
 
     public static final Comparator<Facility> NameComparator =
-            (model1, model2) -> {
-                return model1.getName().compareTo(model2.getName());
+            (f1, f2) -> {
+                return f1.getName().compareTo(f2.getName());
             };
 
     // Constructors ----------------------------------------------------------
@@ -246,6 +248,16 @@ public class Facility extends Model<Facility> implements Constants {
     public void setEmail(String email) {
         this.email = email;
     }
+
+/*
+    public List<Guest> getGuests() {
+        return guests;
+    }
+
+    public void setGuests(List<Guest> guests) {
+        this.guests = guests;
+    }
+*/
 
     public String getName() {
         return name;

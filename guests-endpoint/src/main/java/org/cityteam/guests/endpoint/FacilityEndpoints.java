@@ -43,9 +43,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.logging.Logger;
-
-import static java.util.logging.Level.SEVERE;
 
 @ApplicationScoped
 @Path("/facilities")
@@ -58,10 +55,6 @@ public class FacilityEndpoints {
     
     @Inject
     private FacilityService facilityService;
-
-    // Static Variables ------------------------------------------------------
-
-    private static final Logger LOG = Logger.getLogger(FacilityEndpoints.class.getName());
 
     // Endpoint Methods ------------------------------------------------------
 
@@ -95,7 +88,6 @@ public class FacilityEndpoints {
             Facility facility = facilityService.delete(facilityId);
             return Response.ok(facility).build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "delete(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -138,7 +130,6 @@ public class FacilityEndpoints {
             Facility facility = facilityService.find(facilityId);
             return Response.ok(facility).build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "find(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -171,7 +162,6 @@ public class FacilityEndpoints {
         try {
             return Response.ok(facilityService.findAll()).build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "findAll(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -203,7 +193,6 @@ public class FacilityEndpoints {
         try {
             return Response.ok(facilityService.findByName(name)).build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "findByName(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -240,7 +229,6 @@ public class FacilityEndpoints {
         try {
             return Response.ok(facilityService.findByNameExact(name)).build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "findByNameExact(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -301,7 +289,6 @@ public class FacilityEndpoints {
                     .type(MediaType.TEXT_PLAIN)
                     .build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "insert(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
@@ -365,7 +352,6 @@ public class FacilityEndpoints {
                     .type(MediaType.TEXT_PLAIN)
                     .build();
         } catch (InternalServerError e) {
-            LOG.log(SEVERE, "update(): " + e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
