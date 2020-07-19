@@ -267,7 +267,7 @@ public class FacilityServiceTest extends AbstractServiceTest {
     public void updateHappy() throws Exception {
 
         // Change something but keep name
-        Facility facility1 = findFacilityByNameExact("Portland").get();
+        Facility facility1 = findFacilityByNameExact("Oakland").get();
         facility1.setCity(facility1.getCity() + " Updated");
         facilityService.update(facility1.getId(), facility1);
 

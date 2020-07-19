@@ -197,7 +197,7 @@ public class DevModePopulateService {
 
     private void populateGuests() {
 
-        // NOTE: Do not populate guests for facility "Oakland"
+        // NOTE: Do not populate guests for facility "Portland"
         LOG.info("Populating guests begin");
 
         // Populate guests for facility "Chester"
@@ -221,22 +221,22 @@ public class DevModePopulateService {
                 "Rubble"
         );
 
-        // Populate guests for facility "Portland"
-        Long facilityId2 = lookupFacility("Portland").getId();
+        // Populate guests for facility "Oakland"
+        Long facilityId2 = lookupFacility("Oakland").getId();
         populateGuest(
-                "Portland Fred Comment",
+                "Oakland Fred Comment",
                 facilityId2,
                 "Fred",
                 "Flintstone"
         );
         populateGuest(
-                "Portland Barney Comment",
+                "Oakland Barney Comment",
                 facilityId2,
                 "Barney",
                 "Rubble"
         );
         populateGuest(
-                "Portland Bam Bam Comment",
+                "Oakland Bam Bam Comment",
                 facilityId2,
                 "Bam Bam",
                 "Rubble"

@@ -209,7 +209,7 @@ public class GuestServiceTest extends AbstractServiceTest {
         assertThat(guests1.size(), is(equalTo(0)));
 
         // No guests for facilityId
-        Optional<Facility> facility = findFacilityByNameExact("Oakland");
+        Optional<Facility> facility = findFacilityByNameExact("Portland");
         assertThat(facility.isPresent(), is(true));
         List<Guest> guests2 = guestService.findByFacilityId(facility.get().getId());
         assertThat(guests2.size(), is(equalTo(0)));
@@ -221,7 +221,7 @@ public class GuestServiceTest extends AbstractServiceTest {
     @Test
     public void findByNameHappy() throws Exception {
 
-        String facilityName = "Portland";
+        String facilityName = "Oakland";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
 
@@ -301,7 +301,7 @@ public class GuestServiceTest extends AbstractServiceTest {
         );
 
         // Mismatched lastName
-        String facilityName2 = "Portland";
+        String facilityName2 = "Oakland";
         Optional<Facility> facility2 = findFacilityByNameExact(facilityName2);
         assertThat(facility2.isPresent(), is(true));
         assertThrows(NotFound.class,
@@ -390,7 +390,7 @@ public class GuestServiceTest extends AbstractServiceTest {
     @Test
     public void updateHappy() throws Exception {
 
-        String facilityName = "Portland";
+        String facilityName = "Oakland";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
 
