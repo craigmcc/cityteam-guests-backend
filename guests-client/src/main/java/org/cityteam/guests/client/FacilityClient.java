@@ -16,6 +16,7 @@
 package org.cityteam.guests.client;
 
 import org.cityteam.guests.model.Facility;
+import org.cityteam.guests.model.Guest;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -123,6 +124,106 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
                 .get();
         if (response.getStatus() == RESPONSE_OK) {
             return response.readEntity(Facility.class);
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a list of {@link Guest} objects for the specified
+     * facility, ordered by lastName/firstName.</p>
+     *
+     * @param facilityId ID of the facility for which to retrieve guests
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull List<Guest> findGuestsByFacilityId
+        (@NotNull Long facilityId)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/guests")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(
+                    new GenericType<List<Guest>>() {
+                    }
+            );
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a list of {@link Guest} objects for the specified
+     * facility, matching the specified name segment,
+     * ordered by lastName/firstName.</p>
+     *
+     * @param facilityId ID of the facility for which to retrieve guests
+     * @param name Name segment for which to retrieve guests
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull List<Guest> findGuestsByName(
+        @NotNull Long facilityId,
+        @NotNull String name)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/guests")
+                .path("/name")
+                .path(name)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(
+                    new GenericType<List<Guest>>() {
+                    }
+            );
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a {@link Guest} objects for the specified
+     * facility, matching the specified firstName and lastName.
+     *
+     * @param facilityId ID of the facility for which to retrieve guest
+     * @param firstName First name for which to retrieve guest
+     * @param lastName Last name for which to retrieve guest
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull Guest findGuestsByNameExact(
+            @NotNull Long facilityId,
+            @NotNull String firstName,
+            @NotNull String lastName)
+                throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/guests")
+                .path("/nameExact")
+                .path(firstName)
+                .path(lastName)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(Guest.class);
         } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
             throw new NotFound(response.readEntity(String.class));
         } else {

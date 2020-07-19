@@ -1,6 +1,5 @@
 package org.cityteam.guests.service;
 
-import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.craigmcc.library.model.ModelService;
 import org.craigmcc.library.shared.exception.BadRequest;
@@ -19,12 +18,10 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
-import static org.cityteam.guests.model.Constants.FACILITY_NAME;
 import static org.cityteam.guests.model.Constants.FIRST_NAME_COLUMN;
 import static org.cityteam.guests.model.Constants.GUEST_NAME;
 import static org.cityteam.guests.model.Constants.LAST_NAME_COLUMN;

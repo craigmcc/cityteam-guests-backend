@@ -16,7 +16,9 @@
 package org.cityteam.guests.endpoint;
 
 import org.cityteam.guests.model.Facility;
+import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.service.FacilityService;
+import org.cityteam.guests.service.GuestService;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -55,6 +57,9 @@ public class FacilityEndpoints {
     
     @Inject
     private FacilityService facilityService;
+
+    @Inject
+    private GuestService guestService;
 
     // Endpoint Methods ------------------------------------------------------
 
@@ -163,6 +168,122 @@ public class FacilityEndpoints {
             return Response.ok(facilityService.findAll()).build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/guests")
+    @Operation(description = "Find guests for this facility " +
+            "ordered by lastName, firstName.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Guest.class)
+                    ),
+                    description = "The found guests.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findGuestsByFacilityId(
+            @Parameter(description = "Facility ID for which to find guests.")
+            @PathParam("facilityId") Long facilityId
+    ) {
+        try {
+            return Response.ok(guestService.findByFacilityId(facilityId))
+                    .build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/guests/name/{name}")
+    @Operation(description = "Find guests for this facility " +
+                             "matching name segment, " +
+                             "ordered by lastName, firstName.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Guest.class)
+                    ),
+                    description = "The found guests.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findGuestsByName(
+            @Parameter(description = "Facility ID for which to find guests.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "Name segment match for guests to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(guestService.findByName
+                    (facilityId, name)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/guests/nameExact/{firstName}/{lastName}")
+    @Operation(description = "Find guest for this facility " +
+            "matching firstName and lastName exactly.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Guest.class)
+                    ),
+                    description = "The found guests.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing guest message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findGuestsByNameExact(
+            @Parameter(description = "Facility ID for which to find guest.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "First name of guest to find.")
+            @PathParam("firstName") String firstName,
+            @Parameter(description = "Last name of guest to find.")
+            @PathParam("lastName") String lastName
+    ) {
+        try {
+            return Response.ok(guestService.findByNameExact
+                    (facilityId, firstName, lastName)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
                     .build();
