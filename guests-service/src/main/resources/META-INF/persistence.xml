@@ -25,6 +25,7 @@
 
         <class>org.cityteam.guests.model.Facility</class>
         <class>org.cityteam.guests.model.Guest</class>
+        <class>org.cityteam.guests.model.Registration</class>
 
         <jta-data-source>java:jboss/datasources/GuestsDS</jta-data-source>
 

@@ -24,6 +24,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -34,11 +35,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import java.util.Comparator;
+import java.util.List;
 
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.FIRST_NAME_COLUMN;
@@ -171,6 +174,15 @@ public class Guest extends Model<Guest> implements Constants {
         "First name and last name must be unique within a facility.")
     private String lastName;
 
+    @OneToMany(
+            cascade = CascadeType.REMOVE,
+            fetch = FetchType.LAZY,
+            mappedBy = GUEST_ID_COLUMN,
+            orphanRemoval = true
+
+    )
+    private List<Registration> registrations;
+
     // Static Classes --------------------------------------------------------
 
     public static final Comparator<Guest> NameComparator =
@@ -243,7 +255,17 @@ public class Guest extends Model<Guest> implements Constants {
         this.lastName = lastName;
     }
 
-    // Public Methods --------------------------------------------------------
+/*
+    public List<Registration> getRegistrations() {
+        return registrations;
+    }
+
+    public void setRegistrations(List<Registration> registrations) {
+        this.registrations = registrations;
+    }
+*/
+
+// Public Methods --------------------------------------------------------
 
     @Override
     public void copy(Guest that) {

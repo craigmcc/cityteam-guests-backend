@@ -19,7 +19,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.time.LocalDate;
+
 import static org.cityteam.guests.model.Constants.GUESTS_COLUMN;
+import static org.cityteam.guests.model.Constants.REGISTRATIONS_COLUMN;
 import static org.cityteam.guests.model.Facility.NameComparator;
 import static org.craigmcc.library.model.Constants.PUBLISHED_COLUMN;
 import static org.craigmcc.library.model.Constants.UPDATED_COLUMN;
@@ -42,10 +45,13 @@ public class FacilityUnitTest {
         EqualsVerifier.forClass(Facility.class)
                 .usingGetClass()
                 .withIgnoredFields(PUBLISHED_COLUMN, UPDATED_COLUMN,
-                        VERSION_COLUMN, GUESTS_COLUMN)
+                        VERSION_COLUMN, GUESTS_COLUMN, REGISTRATIONS_COLUMN)
                 .withPrefabValues(Guest.class,
                         new Guest(null, 1L, "Foo", "Bar"),
                         new Guest(null, 2L, "Baz", "Bop"))
+                .withPrefabValues(Registration.class,
+                        new Registration(1L, null, 1, LocalDate.parse("2020-07-04")),
+                        new Registration(2L, null, 2, LocalDate.parse("2020-07-04")))
                 .withRedefinedSuperclass()
                 .verify();
 

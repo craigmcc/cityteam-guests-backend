@@ -15,6 +15,7 @@
  */
 package org.cityteam.guests.service;
 
+import org.cityteam.guests.action.Assign;
 import org.cityteam.guests.model.Constants;
 import org.craigmcc.library.model.Model;
 import org.craigmcc.library.model.ModelService;
@@ -50,6 +51,7 @@ public abstract class AbstractServiceTest {
                 "org.apache.commons.lang3"
         );
         archive.addPackages(true,
+                Assign.class.getPackage(),                 // org.cityteam.guests.action
                 Constants.class.getPackage(),              // org.cityteam.guests.model
                 Model.class.getPackage(),                  // org.craigmcc.library.model
                 BadRequest.class.getPackage()              // org.craigmcc.library.shared.exception

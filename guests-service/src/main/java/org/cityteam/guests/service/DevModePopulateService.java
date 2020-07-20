@@ -17,13 +17,20 @@ package org.cityteam.guests.service;
 
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
+import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.model.types.FeatureType;
+import org.cityteam.guests.model.types.PaymentType;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -58,6 +65,7 @@ public class DevModePopulateService {
         // Populate data in order respecting dependencies
         populateFacilities();
         populateGuests();
+        populateRegistrations();
         // Clean up our temporary data maps
         cleanTemporaryMaps();
         LOG.info("------ Populate Development Test Data End ------");
@@ -285,6 +293,224 @@ public class DevModePopulateService {
         );
 
         LOG.info("Populating guests end");
+    }
+
+    // Unassigned registration
+    private void populateRegistration(
+            Long facilityId,
+            List<FeatureType> features,
+            Integer matNumber,
+            LocalDate registrationDate
+    ) {
+        Registration registration = new Registration(
+                facilityId,
+                features,
+                matNumber,
+                registrationDate
+        );
+        registration.setPublished(LocalDateTime.now());
+        registration.setUpdated(registration.getPublished());
+        System.out.println("TRYING U: " + registration);
+        entityManager.persist(registration);
+    }
+
+    // Assigned registration
+    private void populateRegistration(
+            String comments,
+            Long facilityId,
+            List<FeatureType> features,
+            Long guestId,
+            Integer matNumber,
+            BigDecimal paymentAmount,
+            PaymentType paymentType,
+            LocalDate registrationDate,
+            LocalTime showerTime,
+            LocalTime wakeupTime
+    ) {
+        Registration registration = new Registration(
+                comments,
+                facilityId,
+                features,
+                guestId,
+                matNumber,
+                paymentAmount,
+                paymentType,
+                registrationDate,
+                showerTime,
+                wakeupTime
+        );
+        registration.setPublished(LocalDateTime.now());
+        registration.setUpdated(registration.getPublished());
+        System.out.println("TRYING A: " + registration);
+        entityManager.persist(registration);
+    }
+
+    private void populateRegistrations() {
+
+        // NOTE: Do not populate registrations for facility "Portland"
+        LOG.info("Populating registrations begin");
+
+        // Date and time values of interest
+        LocalDate registrationDate = LocalDate.parse("2020-07-04");
+        LocalTime showerTime = LocalTime.parse("03:30");
+        LocalTime wakeupTime = LocalTime.parse("04:00");
+
+        // Various combinations of features
+        List<FeatureType> features1 =
+                List.of(FeatureType.H);
+        List<FeatureType> features2 =
+                List.of(FeatureType.S);
+        List<FeatureType> features3 =
+                List.of(FeatureType.H, FeatureType.S);
+
+        // Acquire Chester cross reference ids
+        Long chesterFacilityId = lookupFacility("Chester").getId();
+        Long chesterGuestBamBamId =
+                lookupGuest(chesterFacilityId, "Bam Bam", "Rubble").getId();
+        Long chesterGuestBarneyId =
+                lookupGuest(chesterFacilityId, "Barney", "Rubble").getId();
+        Long chesterGuestFredId =
+                lookupGuest(chesterFacilityId, "Fred", "Flintstone").getId();
+
+        // Add unassigned registrations for Chester
+        populateRegistration(
+                chesterFacilityId,
+                features1,
+                1,
+                registrationDate
+        );
+        populateRegistration(
+                chesterFacilityId,
+                features2,
+                2,
+                registrationDate
+        );
+        populateRegistration(
+                chesterFacilityId,
+                features3,
+                3,
+                registrationDate
+        );
+        populateRegistration(
+                chesterFacilityId,
+                null,
+                4,
+                registrationDate
+        );
+
+        // Add assigned registrations for Chester
+        populateRegistration(
+                null,
+                chesterFacilityId,
+                features1,
+                chesterGuestBamBamId,
+                5,
+                null,
+                PaymentType.AG,
+                registrationDate,
+                showerTime,
+                wakeupTime
+        );
+        populateRegistration(
+                "Barney in Chewster",
+                chesterFacilityId,
+                features1,
+                chesterGuestBarneyId,
+                6,
+                null,
+                PaymentType.SW,
+                registrationDate,
+                showerTime,
+                null
+        );
+        populateRegistration(
+                "Fred in Chester",
+                chesterFacilityId,
+                features1,
+                chesterGuestFredId,
+                7,
+                new BigDecimal("5.00"),
+                PaymentType.$$,
+                registrationDate,
+                null,
+                wakeupTime
+        );
+
+        // Acquire Oakland cross reference ids
+        Long oaklandFacilityId = lookupFacility("Oakland").getId();
+        Long oaklandGuestBamBamId =
+                lookupGuest(chesterFacilityId, "Bam Bam", "Rubble").getId();
+        Long oaklandGuestBarneyId =
+                lookupGuest(oaklandFacilityId, "Barney", "Rubble").getId();
+        Long oaklandGuestFredId =
+                lookupGuest(oaklandFacilityId, "Fred", "Flintstone").getId();
+
+        // Add unassigned registrations for Oakland
+        populateRegistration(
+                oaklandFacilityId,
+                features1,
+                1,
+                registrationDate
+        );
+        populateRegistration(
+                oaklandFacilityId,
+                features2,
+                2,
+                registrationDate
+        );
+        populateRegistration(
+                oaklandFacilityId,
+                features3,
+                3,
+                registrationDate
+        );
+        populateRegistration(
+                oaklandFacilityId,
+                null,
+                4,
+                registrationDate
+        );
+
+        // Add assigned registrations for Oakland
+        populateRegistration(
+                null,
+                oaklandFacilityId,
+                features1,
+                oaklandGuestBamBamId,
+                5,
+                null,
+                PaymentType.MM,
+                registrationDate,
+                showerTime,
+                null
+        );
+        populateRegistration(
+                "Barney in Oakland",
+                oaklandFacilityId,
+                features1,
+                oaklandGuestBarneyId,
+                6,
+                null,
+                PaymentType.CT,
+                registrationDate,
+                showerTime,
+                null
+        );
+        populateRegistration(
+                "Fred in Oakland",
+                oaklandFacilityId,
+                features1,
+                oaklandGuestFredId,
+                7,
+                new BigDecimal("4.00"),
+                PaymentType.$$,
+                registrationDate,
+                showerTime,
+                null
+        );
+
+        LOG.info("Populating registrations end");
+
     }
 
 }

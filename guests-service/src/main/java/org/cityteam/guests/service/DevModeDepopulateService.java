@@ -48,7 +48,7 @@ public class DevModeDepopulateService {
     public void depopulate() {
         LOG.info("----- Depopulate Development Test Data Begin -----");
         // depopulate data in order respecting dependencies
-//        depopulateRegistrations();
+        depopulateRegistrations();
 //        depopulateBans();
         depopulateGuests();
 //        depopulateTemplates();

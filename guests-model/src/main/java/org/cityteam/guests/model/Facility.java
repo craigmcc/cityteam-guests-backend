@@ -148,7 +148,6 @@ public class Facility extends Model<Facility> implements Constants {
     @Schema(description = "Phone number of this facility.")
     private String phone;
 
-/*
     @OneToMany(
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY,
@@ -157,7 +156,6 @@ public class Facility extends Model<Facility> implements Constants {
 
     )
     private List<Registration> registrations;
-*/
 
     @Column(
             name = STATE_COLUMN,
@@ -274,6 +272,16 @@ public class Facility extends Model<Facility> implements Constants {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+/*
+    public List<Registration> getRegistrations() {
+        return registrations;
+    }
+
+    public void setRegistrations(List<Registration> registrations) {
+        this.registrations = registrations;
+    }
+*/
 
     public String getState() {
         return state;

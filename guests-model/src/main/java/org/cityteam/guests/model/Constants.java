@@ -40,11 +40,17 @@ public interface Constants {
     String FACILITY_ID_VALIDATION_MESSAGE =
             "facilityId: Required and must identify a valid facility";
 
+    String FEATURES_COLUMN = "features";
+
     String FIRST_NAME_COLUMN = "firstName";
     String FIRST_NAME_VALIDATION_MESSAGE =
             "firstName: Required and must not be blank";
 
+    String GUEST_COLUMN = "guest";
+
     String GUEST_ID_COLUMN = "guestId";
+    String GUEST_ID_VALIDATION_MESSAGE =
+            "guestId: If present must identify a valid guest for this facility";
 
     String GUESTS_COLUMN = "guests";
 
@@ -52,13 +58,29 @@ public interface Constants {
     String LAST_NAME_VALIDATION_MESSAGE =
             "lastName: Required and must not be blank";
 
+    String MAT_NUMBER_COLUMN = "matNumber";
+    String MAT_NUMBER_VALIDATION_MESSAGE =
+            "matNumber: Required and must not be blank";
+
     String NAME_COLUMN = "name";
     String NAME_VALIDATION_MESSAGE =
             "name: Required and must not be blank";
 
+    String PAYMENT_AMOUNT_COLUMN = "paymentAmount";
+
+    String PAYMENT_TYPE_COLUMN = "paymentType";
+
     String PHONE_COLUMN = "phone";
 
+    String REGISTRATION_DATE_COLUMN = "registrationDate";
+
     String REGISTRATION_ID_COLUMN = "registrationId";
+
+    String REGISTRATIONS_COLUMN = "registrations";
+
+    String SHOWER_TIME_COLUMN = "showerTime";
+
+    String WAKEUP_TIME_COLUMN = "wakeupTime";
 
     String STATE_COLUMN = "state";
 

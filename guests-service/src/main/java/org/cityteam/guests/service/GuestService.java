@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 CityTeam, craigmcc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.model.Guest;
@@ -83,9 +98,12 @@ public class GuestService extends ModelService<Guest> {
 
         } catch (NoResultException e) {
             throw new NotFound(
-                    String.format("id: Missing guest %d", guestId)
+                    String.format("guestId: Missing guest %d", guestId)
             );
         } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("delete(%d): %s",
+                            guestId, e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
 
