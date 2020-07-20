@@ -102,7 +102,7 @@ public class GuestService extends ModelService<Guest> {
             );
         } catch (Exception e) {
             LOG.log(SEVERE,
-                    String.format("delete(%d): %s",
+                    String.format("find(%d): %s",
                             guestId, e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }

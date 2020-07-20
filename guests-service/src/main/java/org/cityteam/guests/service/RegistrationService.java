@@ -16,6 +16,7 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.action.Assign;
+import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
 import org.craigmcc.library.model.ModelService;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
+import static org.cityteam.guests.model.Constants.FACILITY_NAME;
 import static org.cityteam.guests.model.Constants.GUEST_NAME;
 import static org.cityteam.guests.model.Constants.MAT_NUMBER_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_DATE_COLUMN;
@@ -153,8 +155,8 @@ public class RegistrationService extends ModelService<Registration> {
                             registrationId));
         } catch (Exception e) {
             LOG.log(SEVERE,
-                    String.format("find(%d): %s,",
-                            registrationId, e.getMessage()), e);
+                    String.format("assign(%d,%s): %s,",
+                            registrationId, assign, e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
 
@@ -209,7 +211,7 @@ public class RegistrationService extends ModelService<Registration> {
                             registrationId));
         } catch (Exception e) {
             LOG.log(SEVERE,
-                    String.format("find(%d): %s,",
+                    String.format("deassign(%d): %s,",
                             registrationId, e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
@@ -315,16 +317,47 @@ public class RegistrationService extends ModelService<Registration> {
     public Registration insert(@NotNull Registration registration)
             throws BadRequest, InternalServerError, NotUnique {
 
-        // We will only be inserting the fields for an unassigned
-        // registration, not all possible fields
-        Registration inserted = new Registration(
-                registration.getFacilityId(),
-                registration.getFeatures(),
-                registration.getMatNumber(),
-                registration.getRegistrationDate()
-        );
+        Registration inserted = null;
 
         try {
+
+            // We can only insert unassigned registrations
+            if (registration.getGuestId() != null) {
+                throw new BadRequest
+                        ("guestId: Can only insert unassigned registrations");
+            }
+
+            // Check for required fields TODO - why is this necessary here?
+            if (registration.getFacilityId() == null) {
+                throw new BadRequest
+                        ("facilityId: Cannot be null");
+            } else if (registration.getRegistrationDate() == null) {
+                throw new BadRequest
+                        ("registrationDate: Cannot be null");
+            }
+
+            // Check foreign key validity TODO - why is this necessary here?
+            TypedQuery<Facility> query1 = entityManager.createNamedQuery
+                    (FACILITY_NAME + ".findById", Facility.class)
+                    .setParameter(ID_COLUMN, registration.getFacilityId());
+            try {
+                query1.getSingleResult();
+            } catch (NoResultException e) {
+                throw new BadRequest
+                        ("facilityId: Must specify valid facility");
+            }
+
+            // We will only be inserting the fields for an unassigned
+            // registration, not all possible fields
+            inserted = new Registration(
+                    registration.getFacilityId(),
+                    registration.getFeatures(),
+                    registration.getMatNumber(),
+                    registration.getRegistrationDate()
+            );
+            inserted.setId(null);
+            inserted.setPublished(LocalDateTime.now());
+            inserted.setUpdated(inserted.getPublished());
 
             // Check uniqueness constraint
             TypedQuery<Registration> query = entityManager.createNamedQuery
@@ -345,20 +378,11 @@ public class RegistrationService extends ModelService<Registration> {
                 // Expected result for a new unique row
             }
 
-            // Copy only the unassigned fields for initial creation
-            inserted = new Registration(
-                    registration.getFacilityId(),
-                    registration.getFeatures(),
-                    registration.getMatNumber(),
-                    registration.getRegistrationDate()
-            );
-
             // Perform the requested insert
-            inserted.setId(null);
-            inserted.setPublished(LocalDateTime.now());
-            inserted.setUpdated(inserted.getUpdated());
             entityManager.persist(inserted);
 
+        } catch (BadRequest e) {
+            throw e;
         } catch (ConstraintViolationException e) {
             throw new BadRequest(formatMessage(e));
         } catch (NotUnique e) {

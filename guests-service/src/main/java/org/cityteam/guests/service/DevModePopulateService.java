@@ -310,7 +310,6 @@ public class DevModePopulateService {
         );
         registration.setPublished(LocalDateTime.now());
         registration.setUpdated(registration.getPublished());
-        System.out.println("TRYING U: " + registration);
         entityManager.persist(registration);
     }
 
@@ -341,13 +340,16 @@ public class DevModePopulateService {
         );
         registration.setPublished(LocalDateTime.now());
         registration.setUpdated(registration.getPublished());
-        System.out.println("TRYING A: " + registration);
         entityManager.persist(registration);
     }
 
     private void populateRegistrations() {
 
+        // WARNING: populateRegistration() bypasses the restrictions
+        // in RegistrationService, so be sure everything you add is valid
+
         // NOTE: Do not populate registrations for facility "Portland"
+
         LOG.info("Populating registrations begin");
 
         // Date and time values of interest
@@ -400,7 +402,7 @@ public class DevModePopulateService {
 
         // Add assigned registrations for Chester
         populateRegistration(
-                null,
+                "Bam Bam in Chester",
                 chesterFacilityId,
                 features1,
                 chesterGuestBamBamId,
@@ -412,7 +414,7 @@ public class DevModePopulateService {
                 wakeupTime
         );
         populateRegistration(
-                "Barney in Chewster",
+                "Barney in Chester",
                 chesterFacilityId,
                 features1,
                 chesterGuestBarneyId,
@@ -439,7 +441,7 @@ public class DevModePopulateService {
         // Acquire Oakland cross reference ids
         Long oaklandFacilityId = lookupFacility("Oakland").getId();
         Long oaklandGuestBamBamId =
-                lookupGuest(chesterFacilityId, "Bam Bam", "Rubble").getId();
+                lookupGuest(oaklandFacilityId, "Bam Bam", "Rubble").getId();
         Long oaklandGuestBarneyId =
                 lookupGuest(oaklandFacilityId, "Barney", "Rubble").getId();
         Long oaklandGuestFredId =
@@ -473,7 +475,7 @@ public class DevModePopulateService {
 
         // Add assigned registrations for Oakland
         populateRegistration(
-                null,
+                "Bam Bam in Oakland",
                 oaklandFacilityId,
                 features1,
                 oaklandGuestBamBamId,

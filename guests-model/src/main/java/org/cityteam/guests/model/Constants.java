@@ -73,6 +73,8 @@ public interface Constants {
     String PHONE_COLUMN = "phone";
 
     String REGISTRATION_DATE_COLUMN = "registrationDate";
+    String REGISTRATION_DATE_VALIDATION_MESSAGE =
+            "registrationDate: Cannot be null";
 
     String REGISTRATION_ID_COLUMN = "registrationId";
 

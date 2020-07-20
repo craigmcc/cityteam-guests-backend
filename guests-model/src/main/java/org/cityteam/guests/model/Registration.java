@@ -209,8 +209,9 @@ public class Registration extends Model<Registration> implements Constants {
 
     @Column(
             name = REGISTRATION_DATE_COLUMN,
-            nullable = true
+            nullable = false
     )
+    @NotNull(message = REGISTRATION_DATE_VALIDATION_MESSAGE)
     private LocalDate registrationDate;
 
     @Column(

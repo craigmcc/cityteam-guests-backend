@@ -43,6 +43,26 @@ public class Assign implements Constants {
     private LocalTime showerTime;
     private LocalTime wakeupTime;
 
+    // Constructors ----------------------------------------------------------
+
+    public Assign() { }
+
+    public Assign(
+            String comments,
+            Long guestId,
+            BigDecimal paymentAmount,
+            PaymentType paymentType,
+            LocalTime showerTime,
+            LocalTime wakeupTime
+    ) {
+        this.comments = comments;
+        this.guestId = guestId;
+        this.paymentAmount = paymentAmount;
+        this.paymentType = paymentType;
+        this.showerTime = showerTime;
+        this.wakeupTime = wakeupTime;
+    }
+
     // Property Methods ------------------------------------------------------
 
     public String getComments() {

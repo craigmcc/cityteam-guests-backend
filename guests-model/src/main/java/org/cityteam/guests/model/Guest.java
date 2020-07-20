@@ -223,6 +223,7 @@ public class Guest extends Model<Guest> implements Constants {
         this.comments = comments;
     }
 
+/*
     public Facility getFacility() {
         return facility;
     }
@@ -230,6 +231,7 @@ public class Guest extends Model<Guest> implements Constants {
     public void setFacility(Facility facility) {
         this.facility = facility;
     }
+*/
 
     public Long getFacilityId() {
         return facilityId;
