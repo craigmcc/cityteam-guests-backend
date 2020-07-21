@@ -92,6 +92,8 @@ public interface Constants {
 
     // Per-Table Constants ---------------------------------------------------
 
+    String ASSIGN_NAME = "Assign"; // Not really a table, but documented like one
+
     String BAN_NAME = "Ban";
     String BAN_TABLE = "bans";
 

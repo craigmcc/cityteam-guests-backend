@@ -22,25 +22,46 @@ import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.types.PaymentType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
-/**
- * <p>Values needed to assign a particular {@link Guest} to a particular
- * {@link Registration}.  The only required value is <code>guestId</code>,
- * which must identify a {@link Guest} associated with the same
- * {@link Facility} as the {@link Registration} that is being updated.
- */
+import static org.cityteam.guests.model.Constants.ASSIGN_NAME;
+
+// API Documentation ---------------------------------------------------------
+
+@Schema(
+        description = "Properties passed to assign a Registration to a " +
+                      "particular Guest.  Only guestId is required.  This " +
+                      "is the only way an unassigned Registration can " +
+                      "receive information about a Guest being assigned " +
+                      "to it.",
+        name = ASSIGN_NAME
+)
+
 public class Assign implements Constants {
 
     // Instance Variables ----------------------------------------------------
 
+    @Schema(description = "Optional comments about this registration.")
     private String comments;
+
+    @Schema(description = "ID of the guest this registration is assigned to.")
     private Long guestId;
+
+    @Schema(description = "Payment amount for this registration.  Only " +
+            "required for payment type $$ (cash).")
     private BigDecimal paymentAmount;
+
+    @Schema(description = "Type of payment for this registration.")
     private PaymentType paymentType;
+
+    @Schema(description = "Time this guest wishes to be awoken " +
+            "for a shower.")
     private LocalTime showerTime;
+
+    @Schema(description = "Time this guest wishes to be awoken.")
     private LocalTime wakeupTime;
 
     // Constructors ----------------------------------------------------------

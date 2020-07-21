@@ -192,12 +192,16 @@ public class Registration extends Model<Registration> implements Constants {
             name = MAT_NUMBER_COLUMN,
             nullable = false
     )
+    @Schema(description = "Unique (per registrationDate) mat number " +
+                          "for this registration.")
     private Integer matNumber;
 
     @Column(
             name = PAYMENT_AMOUNT_COLUMN,
             nullable = true
     )
+    @Schema(description = "Payment amount for this registration.  Only " +
+                          "required for payment type $$ (cash).")
     private BigDecimal paymentAmount;
 
     @Column(
@@ -205,6 +209,7 @@ public class Registration extends Model<Registration> implements Constants {
             nullable = true
     )
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Type of payment for this registration.")
     private PaymentType paymentType;
 
     @Column(
@@ -218,12 +223,15 @@ public class Registration extends Model<Registration> implements Constants {
             name = SHOWER_TIME_COLUMN,
             nullable = true
     )
+    @Schema(description = "Time this guest wishes to be awoken " +
+                          "for a shower.")
     private LocalTime showerTime;
 
     @Column(
             name = WAKEUP_TIME_COLUMN,
             nullable = true
     )
+    @Schema(description = "Time this guest wishes to be awoken.")
     private LocalTime wakeupTime;
 
     // Constructors ----------------------------------------------------------
