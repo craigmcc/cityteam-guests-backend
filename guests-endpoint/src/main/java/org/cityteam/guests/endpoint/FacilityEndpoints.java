@@ -15,10 +15,13 @@
  */
 package org.cityteam.guests.endpoint;
 
+import org.cityteam.guests.action.Import;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
+import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.service.FacilityService;
 import org.cityteam.guests.service.GuestService;
+import org.cityteam.guests.service.RegistrationService;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -45,6 +48,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
 
 @ApplicationScoped
 @Path("/facilities")
@@ -60,6 +65,9 @@ public class FacilityEndpoints {
 
     @Inject
     private GuestService guestService;
+
+    @Inject
+    private RegistrationService registrationService;
 
     // Endpoint Methods ------------------------------------------------------
 
@@ -174,6 +182,78 @@ public class FacilityEndpoints {
         }
     }
 
+    @GET
+    @Path("/name/{name}")
+    @Operation(description = "Find facilities matching name segment.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Facility.class)
+                    ),
+                    description = "The found facilities.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findByName(
+            @Parameter(description = "Name matching segment of facilities to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(facilityService.findByName(name)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/nameExact/{name}")
+    @Operation(description = "Find facilities matching an exact name.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Facility.class)
+                    ),
+                    description = "The found facilities.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing facility message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findByNameExact(
+            @Parameter(description = "Name matching facility to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(facilityService.findByNameExact(name)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
     @GET()
     @Path("/{facilityId}/guests")
     @Operation(description = "Find guests for this facility " +
@@ -210,8 +290,8 @@ public class FacilityEndpoints {
     @GET()
     @Path("/{facilityId}/guests/name/{name}")
     @Operation(description = "Find guests for this facility " +
-                             "matching name segment, " +
-                             "ordered by lastName, firstName.")
+            "matching name segment, " +
+            "ordered by lastName, firstName.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -291,14 +371,15 @@ public class FacilityEndpoints {
     }
 
     @GET
-    @Path("/name/{name}")
-    @Operation(description = "Find facilities matching name segment.")
+    @Path("/{facilityId}/registrations/{registrationDate}")
+    @Operation(description = "Find registrations by facility and " +
+            "registration date.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Facility.class)
+                            implementation = Registration.class)
                     ),
-                    description = "The found facilities.",
+                    description = "The found registrations.",
                     responseCode = "200"
             ),
             @APIResponse(
@@ -307,12 +388,17 @@ public class FacilityEndpoints {
                     responseCode = "500"
             )
     })
-    public Response findByName(
-            @Parameter(description = "Name matching segment of facilities to find.")
-            @PathParam("name") String name
+    public Response findRegistrationsByFacilityAndDate(
+            @Parameter(description = "Facility ID for which to find " +
+                    "registrations.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "Registration date for which to " +
+                    "find registrations.")
+            @PathParam("registrationDate") String registrationDate
     ) {
         try {
-            return Response.ok(facilityService.findByName(name)).build();
+            return Response.ok(registrationService.findByFacilityAndDate
+                    (facilityId, LocalDate.parse(registrationDate))).build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
@@ -321,21 +407,33 @@ public class FacilityEndpoints {
         }
     }
 
-    @GET
-    @Path("/nameExact/{name}")
-    @Operation(description = "Find facilities matching an exact name.")
+    @POST
+    @Path("/{facilityId}/registrations/{registrationDate}")
+    @Operation(description = "Import registration information by " +
+            "facility and registration date.  Guests " +
+            "will be created as necessary.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Facility.class)
+                            implementation = Registration.class)
                     ),
-                    description = "The found facilities.",
-                    responseCode = "200"
+                    description = "The inserted registrations.",
+                    responseCode = "201"
             ),
             @APIResponse(
                     content = @Content(mediaType = MediaType.TEXT_PLAIN),
-                    description = "Missing facility message.",
+                    description = "Bad request message.",
+                    responseCode = "400"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing facility or guest message.",
                     responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Uniqueness conflict message.",
+                    responseCode = "409"
             ),
             @APIResponse(
                     content = @Content(mediaType = MediaType.TEXT_PLAIN),
@@ -343,12 +441,35 @@ public class FacilityEndpoints {
                     responseCode = "500"
             )
     })
-    public Response findByNameExact(
-            @Parameter(description = "Name matching facility to find.")
-            @PathParam("name") String name
+    public Response importRegistrationsByFacilityAndDate(
+            @Parameter(description = "Facility ID for which to import " +
+                    "registrations.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "Registration date for which to " +
+                    "import registrations.")
+            @PathParam("registrationDate") String registrationDate,
+            @Parameter List<Import> imports
     ) {
         try {
-            return Response.ok(facilityService.findByNameExact(name)).build();
+            List<Registration> registrations =
+                    registrationService.importByFacilityAndDate(
+                            facilityId,
+                            LocalDate.parse(registrationDate),
+                            imports
+                    );
+            URI uri = UriBuilder.fromResource(FacilityEndpoints.class)
+                    .path(facilityId.toString())
+                    .path("/registrations")
+                    .path(registrationDate)
+                    .build();
+            return Response.created(uri)
+                    .entity(registrations)
+                    .build();
+        } catch (BadRequest e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())
@@ -356,6 +477,11 @@ public class FacilityEndpoints {
                     .build();
         } catch (NotFound e) {
             return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotUnique e) {
+            return Response.status(Response.Status.CONFLICT)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
                     .build();

@@ -18,63 +18,91 @@ package org.cityteam.guests.action;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.cityteam.guests.model.Constants;
+import org.cityteam.guests.model.types.FeatureType;
 import org.cityteam.guests.model.types.PaymentType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.List;
 
-import static org.cityteam.guests.model.Constants.ASSIGN_NAME;
+import static org.cityteam.guests.model.Constants.IMPORT_NAME;
 
 // API Documentation ---------------------------------------------------------
 
 @Schema(
-        description = "Properties passed to assign a Registration to a " +
-                      "particular Guest.  Only guestId is required.  This " +
-                      "is the only way an unassigned Registration can " +
-                      "receive information about a Guest being assigned " +
-                      "to it.",
-        name = ASSIGN_NAME
+        description = "Properties passed to import historical registration " +
+                      "information.  When processed, a Guest will be created " +
+                      "automatically (if not already present).  Note that " +
+                      "facilityId and registrationDate will be specified by " +
+                      "path parameters on the import request, so are not " +
+                      "included here.",
+        name = IMPORT_NAME
 )
 
-public class Assign implements Constants {
+public class Import implements Constants {
 
     // Instance Variables ----------------------------------------------------
 
-    @Schema(description = "Optional comments about this registration.")
+    @Schema(description = "Comments about thsi registration (if assigned).")
     private String comments;
 
-    @Schema(description = "ID of the guest this registration is assigned to.")
-    private Long guestId;
+    @Schema(description = "Feature identifiers for this matNumber.")
+    private List<FeatureType> features;
 
-    @Schema(description = "Payment amount for this registration.  Only " +
-            "required for payment type $$ (cash).")
+    @Schema(description = "First name of the assigned guest (if any).")
+    private String firstName;
+
+    @Schema (description = "Last name of the assigned guest (if any).")
+    private String lastName;
+
+    @Schema(description = "Unique (per registrationDate) mat number " +
+                          "for this registration.")
+    private Integer matNumber;
+
+    @Schema(description = "Payment amount (if guest is assigned).  Only " +
+                          "required for payment type $$ (cash).")
     private BigDecimal paymentAmount;
 
-    @Schema(description = "Type of payment for this registration.")
+    @Schema(description = "Payment type (if guest is assigned).")
     private PaymentType paymentType;
 
-    @Schema(description = "Time this guest wishes to be awoken " +
-            "for a shower.")
+    @Schema(description = "Requested shower time (if guest is assigned).")
     private LocalTime showerTime;
 
-    @Schema(description = "Time this guest wishes to be awoken.")
+    @Schema(description = "Requested wakeup time (if guest is assigned)")
     private LocalTime wakeupTime;
 
     // Constructors ----------------------------------------------------------
 
-    public Assign() { }
+    public Import() { }
 
-    public Assign(
+    // Unassigned
+    public Import(
+            List<FeatureType> features,
+            Integer matNumber
+    ) {
+        this.features = features;
+        this.matNumber = matNumber;
+    }
+
+    // Assigned
+    public Import(
             String comments,
-            Long guestId,
+            List<FeatureType> features,
+            String firstName,
+            String lastName,
+            Integer matNumber,
             BigDecimal paymentAmount,
             PaymentType paymentType,
             LocalTime showerTime,
             LocalTime wakeupTime
     ) {
         this.comments = comments;
-        this.guestId = guestId;
+        this.features = features;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.matNumber = matNumber;
         this.paymentAmount = paymentAmount;
         this.paymentType = paymentType;
         this.showerTime = showerTime;
@@ -87,13 +115,20 @@ public class Assign implements Constants {
         return comments;
     }
 
-    public Long getGuestId() {
-        return guestId;
+    public List<FeatureType> getFeatures() {
+        return features;
     }
 
-    // For testing only
-    public void setGuestId(Long guestId) {
-        this.guestId = guestId;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Integer getMatNumber() {
+        return matNumber;
     }
 
     public BigDecimal getPaymentAmount() {
@@ -118,7 +153,10 @@ public class Assign implements Constants {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append(COMMENTS_COLUMN, this.comments)
-                .append(GUEST_ID_COLUMN, this.guestId)
+                .append(FEATURES_COLUMN, this.features)
+                .append(FIRST_NAME_COLUMN, this.firstName)
+                .append(LAST_NAME_COLUMN, this.lastName)
+                .append(MAT_NUMBER_COLUMN, this.matNumber)
                 .append(PAYMENT_AMOUNT_COLUMN, this.paymentAmount)
                 .append(PAYMENT_TYPE_COLUMN, this.paymentType)
                 .append(SHOWER_TIME_COLUMN, this.showerTime)

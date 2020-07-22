@@ -24,6 +24,7 @@ import org.craigmcc.library.shared.exception.NotUnique;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -47,7 +48,7 @@ public class FacilityService extends ModelService<Facility> {
     // Instance Variables ----------------------------------------------------
     
     @PersistenceContext
-    protected EntityManager entityManager;
+    private EntityManager entityManager;
 
     // Static Variables ------------------------------------------------------
 

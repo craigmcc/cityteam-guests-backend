@@ -15,8 +15,10 @@
  */
 package org.cityteam.guests.client;
 
+import org.cityteam.guests.action.Import;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
+import org.cityteam.guests.model.Registration;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -28,6 +30,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 public class FacilityClient extends AbstractServiceClient<Facility> {
@@ -226,6 +229,50 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
             return response.readEntity(Guest.class);
         } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
             throw new NotFound(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    public @NotNull List<Registration> findRegistrationsByFacilityAndDate
+            (@NotNull Long facilityId, @NotNull LocalDate registrationDate)
+        throws InternalServerError {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/registrations")
+                .path(registrationDate.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity
+                    (new GenericType<List<Registration>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    public @NotNull List<Registration> importRegistrationsByFacilityAndDate(
+            @NotNull Long facilityId,
+            @NotNull LocalDate registrationDate,
+            @NotNull List<Import> imports
+    ) throws BadRequest, InternalServerError, NotFound, NotUnique {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/registrations")
+                .path(registrationDate.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(imports, MediaType.APPLICATION_JSON));
+        if (response.getStatus() == RESPONSE_CREATED) {
+            return response.readEntity
+                    (new GenericType<List<Registration>>() {});
+        } else if (response.getStatus() == RESPONSE_BAD_REQUEST) {
+            throw new BadRequest(response.readEntity(String.class));
+        } else if (response.getStatus() == RESPONSE_CONFLICT) {
+            throw new NotUnique(response.readEntity(String.class));
         } else {
             throw new InternalServerError(response.readEntity(String.class));
         }

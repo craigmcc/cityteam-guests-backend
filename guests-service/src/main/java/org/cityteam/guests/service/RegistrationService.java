@@ -16,6 +16,7 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.action.Assign;
+import org.cityteam.guests.action.Import;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -27,6 +28,7 @@ import org.craigmcc.library.shared.exception.NotUnique;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -36,6 +38,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,7 +58,13 @@ public class RegistrationService extends ModelService<Registration> {
     // Instance Variables ----------------------------------------------------
 
     @PersistenceContext
-    protected EntityManager entityManager;
+    private EntityManager entityManager;
+
+    @Inject
+    private FacilityService facilityService;
+
+    @Inject
+    private GuestService guestService;
 
     // Static Variables ------------------------------------------------------
 
@@ -115,7 +124,7 @@ public class RegistrationService extends ModelService<Registration> {
                         (GUEST_NAME + ".findById", Guest.class)
                         .setParameter(ID_COLUMN, assign.getGuestId());
                 Guest guest = query2.getSingleResult();
-                if (guest.getFacilityId() != registration.getFacilityId()) {
+                if (guest.getFacilityId().longValue() != registration.getFacilityId().longValue()) {
                     throw new BadRequest(String.format
                             ("guestId: Guest %d does not belong to facility %d",
                                     guest.getId(), registration.getId()));
@@ -306,10 +315,99 @@ public class RegistrationService extends ModelService<Registration> {
 
         } catch (Exception e) {
             LOG.log(SEVERE,
-                    String.format("findByFacilityAndDate(%d,%s)",
+                    String.format("findByFacilityAndDate(%d, %s)",
                             facilityId, registrationDate.toString()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
+
+    }
+
+    public @NotNull List<Registration> importByFacilityAndDate(
+            @NotNull Long facilityId,
+            @NotNull LocalDate registrationDate,
+            List<Import> imports
+    ) throws BadRequest, InternalServerError, NotFound, NotUnique {
+
+        try {
+
+            Facility facility = facilityService.find(facilityId);
+            List<Registration> registrations = new ArrayList<>();
+
+            for (Import imported : imports) {
+
+                // Create an unassigned registration
+                Registration registration = new Registration(
+                        facilityId,
+                        imported.getFeatures(),
+                        imported.getMatNumber(),
+                        registrationDate
+                );
+                registration = insert(registration);
+
+                // If this mat is already assigned, deal with it
+                if (imported.getFirstName() != null) {
+
+                    // Look up existing guest (if any)
+                    Guest guest = null;
+                    try {
+                        guest = guestService.findByNameExact(
+                                facilityId,
+                                imported.getFirstName(),
+                                imported.getLastName()
+                        );
+                    } catch (NotFound e) {
+                        ; // We will create one below
+                    }
+
+                    // Create a new guest if necessary
+                    if (guest == null) {
+                        guest = new Guest(
+                                null,
+                                facilityId,
+                                imported.getFirstName(),
+                                imported.getLastName()
+                        );
+                        guest = guestService.insert(guest);
+                    }
+
+                    // Assign this guest to this registration
+                    Assign assign = new Assign(
+                            imported.getComments(),
+                            guest.getId(),
+                            imported.getPaymentAmount(),
+                            imported.getPaymentType(),
+                            imported.getShowerTime(),
+                            imported.getWakeupTime()
+                    );
+                    registration = assign(registration.getId(), assign);
+
+                }
+
+                // Add this registration to our results
+                registrations.add(registration);
+
+            }
+
+            return registrations;
+
+        } catch (BadRequest e) {
+            throw e;
+        } catch (ConstraintViolationException e) {
+            throw new BadRequest(formatMessage(e));
+        } catch (NotFound e) {
+            throw e;
+        } catch (NotUnique e) {
+            throw e;
+        } catch (PersistenceException e) {
+            handlePersistenceException(e);
+        } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("importByFacilityAndDate(%d, %s)",
+                            facilityId, registrationDate.toString()), e);
+            throw new InternalServerError(e.getMessage(), e);
+        }
+
+        return null;
 
     }
 

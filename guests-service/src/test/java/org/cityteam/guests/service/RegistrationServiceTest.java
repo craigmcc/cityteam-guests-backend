@@ -16,9 +16,11 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.action.Assign;
+import org.cityteam.guests.action.Import;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.model.types.FeatureType;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -40,6 +42,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +54,9 @@ import static org.cityteam.guests.model.Constants.NAME_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_DATE_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_NAME;
 import static org.cityteam.guests.model.types.PaymentType.$$;
+import static org.cityteam.guests.model.types.PaymentType.AG;
+import static org.cityteam.guests.model.types.PaymentType.CT;
+import static org.cityteam.guests.model.types.PaymentType.MM;
 import static org.craigmcc.library.model.Constants.ID_COLUMN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -68,6 +74,8 @@ public class RegistrationServiceTest extends AbstractServiceTest {
     public static JavaArchive createDeployment() {
         JavaArchive archive = ShrinkWrap.create
                 (JavaArchive.class, "testRegistration.jar")
+                .addClass(FacilityService.class)
+                .addClass(GuestService.class)
                 .addClass(RegistrationService.class);
         addServiceFixtures(archive, false);
         System.out.println("RegistrationServiceTest: Assembled Archive:");
@@ -469,6 +477,105 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                 registrationService.findByFacilityAndDate
                         (Long.MAX_VALUE, registrationDate2);
         assertThat(registrations3.size(), is(equalTo(0)));
+
+    }
+
+    // importByFacilityAndDate() tests
+
+    @Test
+    public void importByFaclityAndDate() throws Exception {
+
+        // Accumulate information we need to perform this test
+
+        String facilityName = "San Francisco";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+
+        LocalDate registrationDate = LocalDate.parse("2020-07-05");
+        LocalTime showerTime = LocalTime.parse("04:00");
+        LocalTime wakeupTime = LocalTime.parse("03:30");
+
+        List<FeatureType> features1 =
+                List.of(FeatureType.H);
+        List<FeatureType> features2 =
+                List.of(FeatureType.S);
+        List<FeatureType> features3 =
+                List.of(FeatureType.H, FeatureType.S);
+        List<Import> imports = new ArrayList<>();
+
+        // Add some unassigned mats
+        imports.add(new Import(features1, 1));
+        imports.add(new Import(features2, 2));
+        imports.add(new Import(features3, 3));
+
+        // Add some assigned mats (existing people)
+        imports.add(new Import(
+                "Fred on Mat 4",
+                features1,
+                "Fred",
+                "Flintstone",
+                4,
+                null,
+                AG,
+                showerTime,
+                null
+        ));
+        imports.add(new Import(
+                "Bam Bam on Mat 5",
+                features2,
+                "Bam Bam",
+                "Rubble",
+                5,
+                null,
+                $$,
+                null,
+                wakeupTime
+        ));
+        imports.add(new Import(
+                "Barney on Mat 6",
+                features3,
+                "Barney",
+                "Rubble",
+                6,
+                null,
+                MM,
+                showerTime,
+                wakeupTime
+        ));
+
+        // Add a new guest
+        imports.add(new Import(
+                "New Person on Mat 7",
+                null,
+                "New",
+                "Person",
+                7,
+                null,
+                CT,
+                null,
+                null
+        ));
+
+        // Import these and verify the results
+        List<Registration> registrations =
+                registrationService.importByFacilityAndDate(
+                        facility.get().getId(),
+                        registrationDate,
+                        imports
+                );
+        assertThat(registrations.size(), is(equalTo(imports.size())));
+        System.out.println("IMPORT: RESULTS: " + registrations);
+
+        // Retrieve them again and match them up
+        List<Registration> retrieves =
+                registrationService.findByFacilityAndDate(
+                        facility.get().getId(),
+                        registrationDate
+                );
+        assertThat(retrieves.size(), is(equalTo(registrations.size())));
+        for (int i = 0; i < retrieves.size(); i++) {
+            assertThat(retrieves.get(i), is(equalTo(registrations.get(i))));
+        }
 
     }
 

@@ -91,6 +91,13 @@
             <version>${shared.version}</version>
         </dependency>
 
+        <!-- Microprofile Config APIs -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Microprofile OpenAPI APIs -->
         <dependency>
             <groupId>org.eclipse.microprofile.openapi</groupId>

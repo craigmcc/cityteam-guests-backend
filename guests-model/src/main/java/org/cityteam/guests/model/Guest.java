@@ -38,8 +38,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
 import java.util.Comparator;
 import java.util.List;
 
@@ -99,7 +99,9 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
                         NAME_COLUMN + ",'%'))) OR " +
                         "(g." + LAST_NAME_COLUMN +
                         " LIKE LOWER(CONCAT('%',:" +
-                        NAME_COLUMN + ",'%'))))"
+                        NAME_COLUMN + ",'%')))) " +
+                        "ORDER BY g." + FACILITY_ID_COLUMN + ", g." +
+                        LAST_NAME_COLUMN + ", g." + FIRST_NAME_COLUMN
         ),
         @NamedQuery(
                 name = GUEST_NAME + ".findByNameExact",
@@ -160,7 +162,7 @@ public class Guest extends Model<Guest> implements Constants {
             name = FIRST_NAME_COLUMN,
             nullable = false
     )
-    @NotBlank(message = FIRST_NAME_VALIDATION_MESSAGE)
+    @NotEmpty(message = FIRST_NAME_VALIDATION_MESSAGE)
     @Schema(description = "First name of this guest. " +
         "First name and last name must be unique within a facility.")
     private String firstName;
@@ -169,7 +171,7 @@ public class Guest extends Model<Guest> implements Constants {
             name = LAST_NAME_COLUMN,
             nullable = false
     )
-    @NotBlank(message = LAST_NAME_VALIDATION_MESSAGE)
+    @NotEmpty(message = LAST_NAME_VALIDATION_MESSAGE)
     @Schema(description = "Last name of this guest. " +
         "First name and last name must be unique within a facility.")
     private String lastName;

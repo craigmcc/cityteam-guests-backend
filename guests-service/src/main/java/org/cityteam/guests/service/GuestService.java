@@ -50,7 +50,7 @@ public class GuestService extends ModelService<Guest> {
     // Instance Variables ----------------------------------------------------
 
     @PersistenceContext
-    protected EntityManager entityManager;
+    private EntityManager entityManager;
 
     // Static Variables ------------------------------------------------------
 
