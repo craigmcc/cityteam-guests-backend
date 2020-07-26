@@ -15,7 +15,8 @@
  */
 package org.cityteam.guests.client;
 
-import org.cityteam.guests.action.Import;
+import org.cityteam.guests.action.ImportRequest;
+import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -254,10 +255,10 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
 
     }
 
-    public @NotNull List<Registration> importRegistrationsByFacilityAndDate(
+    public @NotNull ImportResults importRegistrationsByFacilityAndDate(
             @NotNull Long facilityId,
             @NotNull LocalDate registrationDate,
-            @NotNull List<Import> imports
+            @NotNull List<ImportRequest> importRequests
     ) throws BadRequest, InternalServerError, NotFound, NotUnique {
 
         Response response = facilityTarget
@@ -265,10 +266,9 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
                 .path("/registrations")
                 .path(registrationDate.toString())
                 .request(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(imports, MediaType.APPLICATION_JSON));
+                .post(Entity.entity(importRequests, MediaType.APPLICATION_JSON));
         if (response.getStatus() == RESPONSE_CREATED) {
-            return response.readEntity
-                    (new GenericType<List<Registration>>() {});
+            return response.readEntity(ImportResults.class);
         } else if (response.getStatus() == RESPONSE_BAD_REQUEST) {
             throw new BadRequest(response.readEntity(String.class));
         } else if (response.getStatus() == RESPONSE_CONFLICT) {

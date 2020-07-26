@@ -15,7 +15,8 @@
  */
 package org.cityteam.guests.endpoint;
 
-import org.cityteam.guests.action.Import;
+import org.cityteam.guests.action.ImportRequest;
+import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -415,9 +416,11 @@ public class FacilityEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Registration.class)
+                            implementation = ImportResults.class)
                     ),
-                    description = "The inserted registrations.",
+                    description = "Result object containing the list " +
+                            "of inserted registrations " +
+                            "and the list of any associated problems.",
                     responseCode = "201"
             ),
             @APIResponse(
@@ -448,14 +451,14 @@ public class FacilityEndpoints {
             @Parameter(description = "Registration date for which to " +
                     "import registrations.")
             @PathParam("registrationDate") String registrationDate,
-            @Parameter List<Import> imports
+            @Parameter List<ImportRequest> importRequests
     ) {
         try {
-            List<Registration> registrations =
+            ImportResults importResults =
                     registrationService.importByFacilityAndDate(
                             facilityId,
                             LocalDate.parse(registrationDate),
-                            imports
+                            importRequests
                     );
             URI uri = UriBuilder.fromResource(FacilityEndpoints.class)
                     .path(facilityId.toString())
@@ -463,7 +466,7 @@ public class FacilityEndpoints {
                     .path(registrationDate)
                     .build();
             return Response.created(uri)
-                    .entity(registrations)
+                    .entity(importResults)
                     .build();
         } catch (BadRequest e) {
             return Response.status(Response.Status.BAD_REQUEST)

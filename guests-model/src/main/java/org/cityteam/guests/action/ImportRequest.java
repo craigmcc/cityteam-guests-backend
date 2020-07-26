@@ -40,11 +40,11 @@ import static org.cityteam.guests.model.Constants.IMPORT_NAME;
         name = IMPORT_NAME
 )
 
-public class Import implements Constants {
+public class ImportRequest implements Constants {
 
     // Instance Variables ----------------------------------------------------
 
-    @Schema(description = "Comments about thsi registration (if assigned).")
+    @Schema(description = "Comments about this registration (if assigned).")
     private String comments;
 
     @Schema(description = "Feature identifiers for this matNumber.")
@@ -75,10 +75,10 @@ public class Import implements Constants {
 
     // Constructors ----------------------------------------------------------
 
-    public Import() { }
+    public ImportRequest() { }
 
     // Unassigned
-    public Import(
+    public ImportRequest(
             List<FeatureType> features,
             Integer matNumber
     ) {
@@ -87,7 +87,7 @@ public class Import implements Constants {
     }
 
     // Assigned
-    public Import(
+    public ImportRequest(
             String comments,
             List<FeatureType> features,
             String firstName,
@@ -123,8 +123,16 @@ public class Import implements Constants {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
         return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Integer getMatNumber() {

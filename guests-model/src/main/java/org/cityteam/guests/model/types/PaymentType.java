@@ -20,9 +20,10 @@ public enum PaymentType {
     $$("Paid Cash"),
     AG("Agency Voucher"),
     CT("CityTeam Decision"),
-    FM("?????"),
+    FM("Free Mat"),
     MM("Medical Mat"),
-    SW("Severe Weather");
+    SW("Severe Weather"),
+    UK("Unknown");
 
     private String description;
 

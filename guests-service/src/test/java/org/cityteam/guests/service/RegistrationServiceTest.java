@@ -16,7 +16,8 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.action.Assign;
-import org.cityteam.guests.action.Import;
+import org.cityteam.guests.action.ImportRequest;
+import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -63,6 +64,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 @Category(ServiceTests.class)
 @RunWith(Arquillian.class)
@@ -253,7 +255,7 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                 is(equalTo(guests.get(0).getId())));
 
         // Try to assign same guest to a different registration
-        assertThrows(BadRequest.class,
+        assertThrows(NotUnique.class,
                 () -> registrationService.assign
                         (registrations.get(1).getId(), assign));
 
@@ -501,15 +503,15 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                 List.of(FeatureType.S);
         List<FeatureType> features3 =
                 List.of(FeatureType.H, FeatureType.S);
-        List<Import> imports = new ArrayList<>();
+        List<ImportRequest> importRequests = new ArrayList<>();
 
         // Add some unassigned mats
-        imports.add(new Import(features1, 1));
-        imports.add(new Import(features2, 2));
-        imports.add(new Import(features3, 3));
+        importRequests.add(new ImportRequest(features1, 1));
+        importRequests.add(new ImportRequest(features2, 2));
+        importRequests.add(new ImportRequest(features3, 3));
 
         // Add some assigned mats (existing people)
-        imports.add(new Import(
+        importRequests.add(new ImportRequest(
                 "Fred on Mat 4",
                 features1,
                 "Fred",
@@ -520,7 +522,7 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                 showerTime,
                 null
         ));
-        imports.add(new Import(
+        importRequests.add(new ImportRequest(
                 "Bam Bam on Mat 5",
                 features2,
                 "Bam Bam",
@@ -531,7 +533,7 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                 null,
                 wakeupTime
         ));
-        imports.add(new Import(
+        importRequests.add(new ImportRequest(
                 "Barney on Mat 6",
                 features3,
                 "Barney",
@@ -544,7 +546,7 @@ public class RegistrationServiceTest extends AbstractServiceTest {
         ));
 
         // Add a new guest
-        imports.add(new Import(
+        importRequests.add(new ImportRequest(
                 "New Person on Mat 7",
                 null,
                 "New",
@@ -557,14 +559,15 @@ public class RegistrationServiceTest extends AbstractServiceTest {
         ));
 
         // Import these and verify the results
-        List<Registration> registrations =
+        ImportResults importResults =
                 registrationService.importByFacilityAndDate(
                         facility.get().getId(),
                         registrationDate,
-                        imports
+                        importRequests
                 );
-        assertThat(registrations.size(), is(equalTo(imports.size())));
-        System.out.println("IMPORT: RESULTS: " + registrations);
+        assertThat(importResults.getProblems().size(), is(equalTo(0)));
+        assertThat(importResults.getRegistrations().size(),
+                is(equalTo(importRequests.size())));
 
         // Retrieve them again and match them up
         List<Registration> retrieves =
@@ -572,9 +575,11 @@ public class RegistrationServiceTest extends AbstractServiceTest {
                         facility.get().getId(),
                         registrationDate
                 );
-        assertThat(retrieves.size(), is(equalTo(registrations.size())));
+        assertThat(retrieves.size(),
+                is(equalTo(importResults.getRegistrations().size())));
         for (int i = 0; i < retrieves.size(); i++) {
-            assertThat(retrieves.get(i), is(equalTo(registrations.get(i))));
+            assertThat(retrieves.get(i),
+                    is(equalTo(importResults.getRegistrations().get(i))));
         }
 
     }

@@ -16,7 +16,9 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.action.Assign;
-import org.cityteam.guests.action.Import;
+import org.cityteam.guests.action.ImportRequest;
+import org.cityteam.guests.action.ImportProblem;
+import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -89,15 +91,15 @@ public class RegistrationService extends ModelService<Registration> {
      *
      * @throws BadRequest Specified guest is specified or is not associated
      *                    with the same facility as this registration, or
-     *                    the specified registration is already assigned, or
-     *                    the specified guest is already assigned to a
-     *                    different mat on this registration date
+     *                    the specified registration is already assigned
      * @throws NotFound Specified guest or registration cannot be found
+     * @throws NotUnique If this guest is already assigned to a different
+     *                   mat on this registration date
      * @throws InternalServerError A server side error has occurred
      */
     public Registration assign(@NotNull Long registrationId,
                                @NotNull Assign assign)
-        throws BadRequest, InternalServerError, NotFound {
+        throws BadRequest, InternalServerError, NotFound, NotUnique {
 
         try {
 
@@ -138,7 +140,7 @@ public class RegistrationService extends ModelService<Registration> {
             for (Registration existing : existings) {
                 if ((existing.getGuestId() == assign.getGuestId()) &&
                         (existing.getId() != registration.getId())) {
-                    throw new BadRequest(String.format
+                    throw new NotUnique(String.format
                             ("guestId: Guest %d is already assigned to mat %d",
                                     existing.getGuestId(), existing.getMatNumber()));
                 }
@@ -157,6 +159,8 @@ public class RegistrationService extends ModelService<Registration> {
             return registration;
 
         } catch (BadRequest e) {
+            throw e;
+        } catch (NotUnique e) {
             throw e;
         } catch (NoResultException e) {
             throw new NotFound(String.format
@@ -322,38 +326,39 @@ public class RegistrationService extends ModelService<Registration> {
 
     }
 
-    public @NotNull List<Registration> importByFacilityAndDate(
+    public @NotNull ImportResults importByFacilityAndDate(
             @NotNull Long facilityId,
             @NotNull LocalDate registrationDate,
-            List<Import> imports
+            List<ImportRequest> importRequests
     ) throws BadRequest, InternalServerError, NotFound, NotUnique {
 
         try {
 
-            Facility facility = facilityService.find(facilityId);
+            facilityService.find(facilityId);
+            List<ImportProblem> problems = new ArrayList<>();
             List<Registration> registrations = new ArrayList<>();
 
-            for (Import imported : imports) {
+            for (ImportRequest importRequest : importRequests) {
 
                 // Create an unassigned registration
                 Registration registration = new Registration(
                         facilityId,
-                        imported.getFeatures(),
-                        imported.getMatNumber(),
+                        importRequest.getFeatures(),
+                        importRequest.getMatNumber(),
                         registrationDate
                 );
                 registration = insert(registration);
 
                 // If this mat is already assigned, deal with it
-                if (imported.getFirstName() != null) {
+                if (importRequest.getFirstName() != null) {
 
                     // Look up existing guest (if any)
                     Guest guest = null;
                     try {
                         guest = guestService.findByNameExact(
                                 facilityId,
-                                imported.getFirstName(),
-                                imported.getLastName()
+                                importRequest.getFirstName(),
+                                importRequest.getLastName()
                         );
                     } catch (NotFound e) {
                         ; // We will create one below
@@ -364,22 +369,30 @@ public class RegistrationService extends ModelService<Registration> {
                         guest = new Guest(
                                 null,
                                 facilityId,
-                                imported.getFirstName(),
-                                imported.getLastName()
+                                importRequest.getFirstName(),
+                                importRequest.getLastName()
                         );
                         guest = guestService.insert(guest);
                     }
 
                     // Assign this guest to this registration
                     Assign assign = new Assign(
-                            imported.getComments(),
+                            importRequest.getComments(),
                             guest.getId(),
-                            imported.getPaymentAmount(),
-                            imported.getPaymentType(),
-                            imported.getShowerTime(),
-                            imported.getWakeupTime()
+                            importRequest.getPaymentAmount(),
+                            importRequest.getPaymentType(),
+                            importRequest.getShowerTime(),
+                            importRequest.getWakeupTime()
                     );
-                    registration = assign(registration.getId(), assign);
+                    try {
+                        registration = assign(registration.getId(), assign);
+                    } catch (NotUnique e) {
+                        problems.add(new ImportProblem(
+                                "NotUnique: " + e.getMessage(),
+                                importRequest,
+                                "Left unassigned"
+                        ));
+                    }
 
                 }
 
@@ -388,7 +401,7 @@ public class RegistrationService extends ModelService<Registration> {
 
             }
 
-            return registrations;
+            return new ImportResults(problems, registrations);
 
         } catch (BadRequest e) {
             throw e;

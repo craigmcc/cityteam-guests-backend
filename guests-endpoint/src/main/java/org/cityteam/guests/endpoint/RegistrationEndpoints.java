@@ -80,6 +80,11 @@ public class RegistrationEndpoints {
             ),
             @APIResponse(
                     content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Uniqueness conflict message.",
+                    responseCode = "409"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
                     description = "Internal server error message.",
                     responseCode = "500"
             )
@@ -114,6 +119,11 @@ public class RegistrationEndpoints {
                     .build();
         } catch (NotFound e) {
             return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotUnique e) {
+            return Response.status(Response.Status.CONFLICT)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
                     .build();
