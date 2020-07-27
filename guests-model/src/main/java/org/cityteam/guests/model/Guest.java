@@ -125,6 +125,15 @@ public class Guest extends Model<Guest> implements Constants {
 
     // Instance Variables ----------------------------------------------------
 
+    @OneToMany(
+            cascade = CascadeType.REMOVE,
+            fetch = FetchType.LAZY,
+            mappedBy = GUEST_ID_COLUMN,
+            orphanRemoval = true
+    )
+    @Schema(hidden = true)
+    private List<Ban> bans;
+
     @Column(
             name = COMMENTS_COLUMN,
             nullable = true
@@ -216,6 +225,16 @@ public class Guest extends Model<Guest> implements Constants {
     }
 
     // Property Methods ------------------------------------------------------
+
+/*
+    public List<Ban> getBans() {
+        return bans;
+    }
+
+    public void setBans(List<Ban> bans) {
+        this.bans = bans;
+    }
+*/
 
     public String getComments() {
         return comments;

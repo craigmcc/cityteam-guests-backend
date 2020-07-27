@@ -23,6 +23,7 @@
     <!-- Point at "GuestsDS" (Postgres) data source added to Wildfly -->
     <persistence-unit name="prod">
 
+        <class>org.cityteam.guests.model.Ban</class>
         <class>org.cityteam.guests.model.Facility</class>
         <class>org.cityteam.guests.model.Guest</class>
         <class>org.cityteam.guests.model.Registration</class>

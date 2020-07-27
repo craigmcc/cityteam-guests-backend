@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 
 import java.time.LocalDate;
 
+import static org.cityteam.guests.model.Constants.BANS_COLUMN;
 import static org.cityteam.guests.model.Constants.FACILITY_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATIONS_COLUMN;
 import static org.cityteam.guests.model.Guest.NameComparator;
@@ -45,7 +46,14 @@ public class GuestUnitTest {
         EqualsVerifier.forClass(Guest.class)
                 .usingGetClass()
                 .withIgnoredFields(PUBLISHED_COLUMN, UPDATED_COLUMN,
-                        VERSION_COLUMN, FACILITY_COLUMN, REGISTRATIONS_COLUMN)
+                        VERSION_COLUMN,
+                        BANS_COLUMN, FACILITY_COLUMN, REGISTRATIONS_COLUMN)
+                .withPrefabValues(Ban.class,
+                        new Ban(false, LocalDate.now(), LocalDate.now(),
+                                null, 1L, null),
+                        new Ban(false, LocalDate.now(), LocalDate.now(),
+                                null, 2L, null)
+                        )
                 .withPrefabValues(Facility.class,
                         new Facility(null, null, null, null, "First",
                                 null, null, null),

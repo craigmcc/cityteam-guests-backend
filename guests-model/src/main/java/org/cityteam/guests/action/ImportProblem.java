@@ -19,9 +19,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import static org.cityteam.guests.model.Constants.IMPORT_PROBLEM_NAME;
+
 // API Documentation ---------------------------------------------------------
 
-@Schema(description = "Problem report on a particular import.")
+@Schema(
+        description = "Problem report on a particular import.",
+        name = IMPORT_PROBLEM_NAME
+)
 
 public class ImportProblem {
 

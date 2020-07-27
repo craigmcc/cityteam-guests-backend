@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.cityteam.guests.model.Constants.IMPORT_NAME;
+import static org.cityteam.guests.model.Constants.IMPORT_REQUEST_NAME;
 
 // API Documentation ---------------------------------------------------------
 
@@ -37,7 +37,7 @@ import static org.cityteam.guests.model.Constants.IMPORT_NAME;
                       "facilityId and registrationDate will be specified by " +
                       "path parameters on the import request, so are not " +
                       "included here.",
-        name = IMPORT_NAME
+        name = IMPORT_REQUEST_NAME
 )
 
 public class ImportRequest implements Constants {

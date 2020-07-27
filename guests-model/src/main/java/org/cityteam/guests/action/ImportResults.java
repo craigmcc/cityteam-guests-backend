@@ -22,9 +22,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.util.List;
 
+import static org.cityteam.guests.model.Constants.IMPORT_RESULTS_NAME;
+
 // API Documentation ---------------------------------------------------------
 
-@Schema(description = "Results of processing a list of imports.")
+@Schema(
+        description = "Results of processing a list of imports.",
+        name = IMPORT_RESULTS_NAME
+)
 
 public class ImportResults {
 

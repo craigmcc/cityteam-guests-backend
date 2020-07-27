@@ -22,11 +22,19 @@ public interface Constants {
 
     // Per-Column Constants --------------------------------------------------
 
+    String ACTIVE_COLUMN = "active";
+
     String ADDRESS1_COLUMN = "address1";
 
     String ADDRESS2_COLUMN = "address2";
 
+    String BAN_FROM_COLUMN = "banFrom";
+
     String BAN_ID_COLUMN = "banId";
+
+    String BAN_TO_COLUMN = "banTo";
+
+    String BANS_COLUMN = "bans";
 
     String CITY_COLUMN = "city";
 
@@ -82,11 +90,13 @@ public interface Constants {
 
     String SHOWER_TIME_COLUMN = "showerTime";
 
-    String WAKEUP_TIME_COLUMN = "wakeupTime";
+    String STAFF_COLUMN = "staff";
 
     String STATE_COLUMN = "state";
 
     String TEMPLATE_ID_COLUMN = "templateId";
+
+    String WAKEUP_TIME_COLUMN = "wakeupTime";
 
     String ZIPCODE_COLUMN = "zipCode";
 
@@ -105,7 +115,13 @@ public interface Constants {
     String GUEST_TABLE = "guests";
 
     // Not really a table, but documented like one
-    String IMPORT_NAME = "Import";
+    String IMPORT_PROBLEM_NAME = "ImportProblem";
+
+    // Not really a table, but documented like one
+    String IMPORT_REQUEST_NAME = "ImportRequest";
+
+    // Not really a table, but documented like one
+    String IMPORT_RESULTS_NAME = "ImportResults";
 
     String REGISTRATION_NAME = "Registration";
     String REGISTRATION_TABLE = "registrations";
