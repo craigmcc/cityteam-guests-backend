@@ -182,12 +182,21 @@ public class BanService extends ModelService<Ban> {
         try {
 
             // Check from/to ordering
+            if (ban.getBanFrom() == null) {
+                throw new BadRequest("banFrom: Cannot be null");
+            }
+            if (ban.getBanTo() == null) {
+                throw new BadRequest("banTo: Cannot be null");
+            }
             if (ban.getBanFrom().compareTo(ban.getBanTo()) > 0) {
                 throw new BadRequest("banFrom: Cannot be greater than banTo");
             }
 
             // Check valid guest
             try {
+                if (ban.getGuestId() ==  null) {
+                    throw new BadRequest("guestId: Cannot be null");
+                }
                 guestService.find(ban.getGuestId());
             } catch (NotFound e) {
                 throw new BadRequest(String.format("guestId: Missing guest %d",
@@ -204,6 +213,10 @@ public class BanService extends ModelService<Ban> {
                 if ((ban.getBanTo().compareTo(existingBan.getBanFrom()) >= 0) &&
                     (ban.getBanTo().compareTo(existingBan.getBanTo()) <= 0)) {
                     throw new NotUnique("banTo: Overlaps existing ban");
+                }
+                if ((ban.getBanFrom().compareTo(existingBan.getBanFrom()) <= 0) &&
+                    (ban.getBanTo().compareTo(existingBan.getBanTo()) >= 0)) {
+                    throw new NotUnique("banFrom/banTo: Overlaps existing ban");
                 }
             }
 

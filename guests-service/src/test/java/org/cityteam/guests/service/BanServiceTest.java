@@ -18,7 +18,9 @@ package org.cityteam.guests.service;
 import org.cityteam.guests.model.Ban;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
+import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.NotFound;
+import org.craigmcc.library.shared.exception.NotUnique;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -227,7 +229,7 @@ public class BanServiceTest extends AbstractServiceTest {
         assertThat(facility.isPresent(), is(true));
 
         Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
-                "Barney", "Rubble");
+                "Fred", "Flintstone");
         assertThat(guest.isPresent(), is(true));
 
         banService.findByGuestIdAndRegistrationDate
@@ -259,15 +261,15 @@ public class BanServiceTest extends AbstractServiceTest {
         assertThrows(NotFound.class,
                 () -> banService.findByGuestIdAndRegistrationDate
                         (guest.get().getId(),
-                                LocalDate.parse("2020-07-15")));
+                                LocalDate.parse("2020-08-15")));
         assertThrows(NotFound.class,
                 () -> banService.findByGuestIdAndRegistrationDate
                         (guest.get().getId(),
-                                LocalDate.parse("2020-09-15")));
+                                LocalDate.parse("2020-10-15")));
         assertThrows(NotFound.class,
                 () -> banService.findByGuestIdAndRegistrationDate
                         (guest.get().getId(),
-                                LocalDate.parse("2020-11-15")));
+                                LocalDate.parse("2020-12-15")));
 
     }
 
@@ -297,61 +299,112 @@ public class BanServiceTest extends AbstractServiceTest {
 
     }
 
-/*
     @Test
     public void insertBadRequest() throws Exception {
 
-        String facilityName = "Chester";
+        String facilityName = "Oakland";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
 
-        // Completely empty instance
-        final Ban guest0 = new Ban();
-        assertThrows(BadRequest.class,
-                () -> banService.insert(guest0));
+        Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
+                "Bam Bam", "Rubble");
+        assertThat(guest.isPresent(), is(true));
 
-        // Missing facilityId field
-        final Ban guest1 = newBan(facility.get().getId());
-        guest1.setFacilityId(null);
+        // Missing guestId field
+        final Ban ban1 = newBan(guest.get().getId());
+        ban1.setGuestId(null);
         assertThrows(BadRequest.class,
-                () -> banService.insert(guest1));
+                () -> banService.insert(ban1));
 
-        // Invalid facilityId field
-        final Ban guest2 = newBan(facility.get().getId());
-        guest2.setFacilityId(Long.MAX_VALUE);
+        // Invalid guestId field
+        final Ban ban2 = newBan(guest.get().getId());
+        ban2.setGuestId(Long.MAX_VALUE);
         assertThrows(BadRequest.class,
-                () -> banService.insert(guest2));
+                () -> banService.insert(ban2));
 
-        // Missing firstName field
-        final Ban guest3 = newBan(facility.get().getId());
-        guest3.setFirstName(null);
+        // Missing banFrom field
+        final Ban ban3 = newBan(guest.get().getId());
+        ban3.setBanFrom(null);
         assertThrows(BadRequest.class,
-                () -> banService.insert(guest3));
+                () -> banService.insert(ban3));
 
-        // Missing lastName field
-        final Ban guest4 = newBan(facility.get().getId());
-        guest4.setLastName(null);
+        // Missing banTo field
+        final Ban ban4 = newBan(guest.get().getId());
+        ban4.setBanTo(null);
         assertThrows(BadRequest.class,
-                () -> banService.insert(guest4));
+                () -> banService.insert(ban4));
+
+        // Out of order ban dates
+        final Ban ban5 = newBan(guest.get().getId());
+        ban5.setBanFrom(LocalDate.parse("2012-07-15"));
+        ban5.setBanTo(LocalDate.parse("2012-07-10"));
+        assertThrows(BadRequest.class,
+                () -> banService.insert(ban5));
 
     }
-*/
 
-/*
     @Test
     public void insertNotUnique() throws Exception {
 
-        String facilityName = "Chester";
+        String facilityName = "San Francisco";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
 
-        Ban guest = newBan(facility.get().getId());
-        Ban inserted = banService.insert(guest);
+        Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
+                "Barney", "Rubble");
+        assertThat(guest.isPresent(), is(true));
+
+        // Proposed from date matches existing to date
+        Ban ban1 = newBan(guest.get().getId());
+        ban1.setBanFrom(LocalDate.parse("2020-09-30"));
+        ban1.setBanTo(LocalDate.parse("2020-10-01"));
         assertThrows(NotUnique.class,
-                () -> banService.insert(inserted));
+                () -> banService.insert(ban1));
+
+        // Proposed from date inside existing ban
+        Ban ban2 = newBan(guest.get().getId());
+        ban2.setBanFrom(LocalDate.parse("2020-09-29"));
+        ban2.setBanTo(LocalDate.parse("2020-10-01"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban2));
+
+        // Proposed to date matches existing from date
+        Ban ban3 = newBan(guest.get().getId());
+        ban3.setBanFrom(LocalDate.parse("2020-08-05"));
+        ban3.setBanTo(LocalDate.parse("2020-09-01"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban3));
+
+        // Proposed to date inside existing ban
+        Ban ban4 = newBan(guest.get().getId());
+        ban4.setBanFrom(LocalDate.parse("2020-08-05"));
+        ban4.setBanTo(LocalDate.parse("2020-09-03"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban4));
+
+        // Proposed ban inside existing ban
+        Ban ban5 = newBan(guest.get().getId());
+        ban5.setBanFrom(LocalDate.parse("2020-09-05"));
+        ban5.setBanTo(LocalDate.parse("2020-09-10"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban5));
+
+        // Proposed ban matches existing ban
+        Ban ban6 = newBan(guest.get().getId());
+        ban6.setBanFrom(LocalDate.parse("2020-09-01"));
+        ban6.setBanTo(LocalDate.parse("2020-09-30"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban6));
+
+        // Proposed ban subsumes existing ban
+        Ban ban7 = newBan(guest.get().getId());
+        ban7.setBanFrom(LocalDate.parse("2020-08-31"));
+        ban7.setBanTo(LocalDate.parse("2020-10-01"));
+        assertThrows(NotUnique.class,
+                () -> banService.insert(ban7));
 
     }
-*/
+
 
     // update() tests
 
