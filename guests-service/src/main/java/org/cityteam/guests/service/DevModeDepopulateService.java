@@ -49,7 +49,7 @@ public class DevModeDepopulateService {
         LOG.info("----- Depopulate Development Test Data Begin -----");
         // depopulate data in order respecting dependencies
         depopulateRegistrations();
-//        depopulateBans();
+        depopulateBans();
         depopulateGuests();
 //        depopulateTemplates();
         depopulateFacilities();

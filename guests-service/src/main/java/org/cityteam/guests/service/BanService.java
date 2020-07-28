@@ -16,13 +16,14 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.model.Ban;
-import org.cityteam.guests.model.Guest;
 import org.craigmcc.library.model.ModelService;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -39,10 +40,11 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.SEVERE;
 import static org.cityteam.guests.model.Constants.BAN_NAME;
 import static org.cityteam.guests.model.Constants.GUEST_ID_COLUMN;
-import static org.cityteam.guests.model.Constants.GUEST_NAME;
 import static org.cityteam.guests.model.Constants.REGISTRATION_DATE_COLUMN;
 import static org.craigmcc.library.model.Constants.ID_COLUMN;
 
+@LocalBean
+@Stateless
 public class BanService extends ModelService<Ban> {
 
     // Instance Variables ----------------------------------------------------
@@ -146,10 +148,10 @@ public class BanService extends ModelService<Ban> {
 
     }
 
-    public @NotNull List<Ban> findByGuestIdAndRegistrationDate(
+    public @NotNull Ban findByGuestIdAndRegistrationDate(
             @NotNull Long guestId,
             @NotNull LocalDate registrationDate)
-            throws InternalServerError {
+            throws InternalServerError, NotFound {
 
         try {
 
@@ -158,12 +160,16 @@ public class BanService extends ModelService<Ban> {
                             Ban.class)
                     .setParameter(GUEST_ID_COLUMN, guestId)
                     .setParameter(REGISTRATION_DATE_COLUMN, registrationDate);
-            return query.getResultList();
+            return query.getSingleResult();
 
+        } catch (NoResultException e) {
+            throw new NotFound("guestId/registrationDate: Missing ban for " +
+                    "guestId " + guestId + " and date " + registrationDate);
         } catch (Exception e) {
             LOG.log(SEVERE,
-                    String.format("findByGuestId(%d): %s",
-                            guestId, e.getMessage()), e);
+                    String.format(
+                            "findByGuestIdAndRegistrationDate(%d, %s): %s",
+                            guestId, registrationDate, e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
 

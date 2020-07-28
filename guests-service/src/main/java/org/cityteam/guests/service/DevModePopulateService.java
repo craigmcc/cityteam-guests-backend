@@ -15,6 +15,7 @@
  */
 package org.cityteam.guests.service;
 
+import org.cityteam.guests.model.Ban;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
@@ -65,6 +66,7 @@ public class DevModePopulateService {
         // Populate data in order respecting dependencies
         populateFacilities();
         populateGuests();
+        populateBans();
         populateRegistrations();
         // Clean up our temporary data maps
         cleanTemporaryMaps();
@@ -102,6 +104,73 @@ public class DevModePopulateService {
 
         }
         return guest;
+    }
+
+    private void populateBan(
+            Boolean active,
+            LocalDate banFrom,
+            LocalDate banTo,
+            String comments,
+            Long guestId,
+            String staff
+    ) {
+        Ban ban = new Ban(
+                active,
+                banFrom,
+                banTo,
+                comments,
+                guestId,
+                staff
+        );
+        ban.setPublished(LocalDateTime.now());
+        ban.setUpdated(ban.getPublished());
+        entityManager.persist(ban);
+    }
+
+    private void populateBans() {
+
+        // NOTE: Do not populate guests for facility "Portland"
+        LOG.info("Populating bans begin");
+
+        // Populate bans for facility "San Francisco"
+        Long facilityId3 = lookupFacility("San Francisco").getId();
+
+        Long guestId3_Fred = lookupGuest(facilityId3,
+                "Fred", "Flintstone").getId();
+        populateBan(true,
+                LocalDate.parse("2020-08-01"),
+                LocalDate.parse("2020-08-31"),
+                "San Francisco Fred August Ban",
+                guestId3_Fred,
+                "Manager"
+        );
+        populateBan(false,
+                LocalDate.parse("2020-10-01"),
+                LocalDate.parse("2020-10-31"),
+                "San Francisco Fred October Ban",
+                guestId3_Fred,
+                "Manager"
+        );
+
+        Long guestId3_Barney = lookupGuest(facilityId3,
+                "Barney", "Rubble").getId();
+        populateBan(true,
+                LocalDate.parse("2020-09-01"),
+                LocalDate.parse("2020-09-30"),
+                "San Francisco Barney September Ban",
+                guestId3_Barney,
+                "Manager"
+        );
+        populateBan(false,
+                LocalDate.parse("2020-11-01"),
+                LocalDate.parse("2020-11-30"),
+                "San Francisco Barney November Ban",
+                guestId3_Barney,
+                "Manager"
+        );
+
+        LOG.info("Populating bans end");
+
     }
 
     private void populateFacility(
