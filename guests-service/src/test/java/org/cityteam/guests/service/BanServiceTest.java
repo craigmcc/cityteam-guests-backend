@@ -162,7 +162,7 @@ public class BanServiceTest extends AbstractServiceTest {
 
         String previousKey = null;
         for (Ban ban : bans) {
-            String thisKey = "" + ban.getGuestId() + "|" +ban.getBanFrom();
+            String thisKey = "" + ban.getGuestId() + "|" + ban.getBanFrom();
             if (previousKey != null) {
                 assertThat(thisKey, is(greaterThan(previousKey)));
             }
@@ -408,145 +408,79 @@ public class BanServiceTest extends AbstractServiceTest {
 
     // update() tests
 
-/*
     @Test
     public void updateHappy() throws Exception {
 
-        String facilityName = "Oakland";
+        String facilityName = "San Francisco";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
 
-        // Change something but keep firstName/lastName
-        Ban guest1 = findBanByNameExact(
-                facility.get().getId(),
-                "Fred",
-                "Flintstone").get();
-        guest1.setComments(guest1.getComments() + " Updated");
-        banService.update(guest1.getId(), guest1);
+        Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
+                "Bam Bam", "Rubble");
+        assertThat(guest.isPresent(), is(true));
 
-        // Change firstName to something unique
-        Ban guest2 = findBanByNameExact(
-                facility.get().getId(),
-                "Fred",
-                "Flintstone").get();
-        guest2.setFirstName(guest2.getFirstName() + " Updated");
-        banService.update(guest2.getId(), guest2);
+        Ban ban = newBan(guest.get().getId());
+        Ban inserted = banService.insert(ban);
 
-        // Change lastName to something unique
-        Ban guest3 = findBanByNameExact(
-                facility.get().getId(),
-                "Barney",
-                "Rubble").get();
-        guest2.setLastName(guest3.getLastName() + " Updated");
-        banService.update(guest3.getId(), guest3);
+        inserted.setActive(!ban.getActive());
+        inserted.setComments("Updated comment");
+        inserted.setStaff("Updated staff");
+        banService.update(inserted.getId(), inserted);
 
     }
-*/
 
-/*
     @Test
     public void updateBadRequest() throws Exception {
 
         String facilityName = "San Francisco";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
-        String firstName = "Fred";
-        String lastName = "Flintstone";
-        Optional<Ban> original = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        );
 
-        // Completely empty instance
-        final Ban guest0 = new Ban();
-        assertThrows(BadRequest.class,
-                () -> banService.update(original.get().getId(), guest0));
+        Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
+                "Bam Bam", "Rubble");
+        assertThat(guest.isPresent(), is(true));
 
-        // Missing facilityId field
-        final Ban guest1 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        guest1.setFacilityId(null);
-        assertThrows(BadRequest.class,
-                () -> banService.update(original.get().getId(), guest1));
+        Ban original = newBan(guest.get().getId());
+        Ban inserted = banService.insert(original);
 
-        // Invalid facilityId field
-        final Ban guest2 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        guest2.setFacilityId(Long.MAX_VALUE);
+        // Attempt to change banFrom
+        final Ban updated1 = findBanById(inserted.getId()).get();
+        updated1.setBanFrom(LocalDate.parse("2020-06-15"));
         assertThrows(BadRequest.class,
-                () -> banService.update(original.get().getId(), guest2));
+                () -> banService.update(inserted.getId(), updated1));
 
-        // Missing firstName field
-        final Ban guest3 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        guest3.setFirstName(null);
+        // Attempt to change banTo
+        final Ban updated2 = findBanById(inserted.getId()).get();
+        updated2.setBanFrom(LocalDate.parse("2020-12-25"));
         assertThrows(BadRequest.class,
-                () -> banService.update(original.get().getId(), guest3));
+                () -> banService.update(inserted.getId(), updated2));
 
-        // Missing lastName field
-        final Ban guest4 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        guest4.setLastName(null);
+        // Attempt to change guestId
+        final Ban updated3 = findBanById(inserted.getId()).get();
+        updated3.setGuestId(inserted.getGuestId() + 1);
         assertThrows(BadRequest.class,
-                () -> banService.update(original.get().getId(), guest4));
+                () -> banService.update(inserted.getId(), updated3));
 
     }
-*/
 
-/*
     @Test
-    public void updateNotUnique() throws Exception {
+    public void updateNotFound() throws Exception {
 
         String facilityName = "San Francisco";
         Optional<Facility> facility = findFacilityByNameExact(facilityName);
         assertThat(facility.isPresent(), is(true));
-        String firstName = "Fred";
-        String lastName = "Flintstone";
-        Optional<Ban> original = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        );
 
-        // Violate name uniqueness in same facility
-        final Ban guest5 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        guest5.setFirstName("Barney");
-        guest5.setLastName("Rubble");
-        assertThrows(NotUnique.class,
-                () -> banService.update(original.get().getId(), guest5));
+        Optional<Guest> guest = findGuestByNameExact(facility.get().getId(),
+                "Bam Bam", "Rubble");
+        assertThat(guest.isPresent(), is(true));
 
-        // Violate name uniqueness in different facility
-        final Ban guest6 = findBanByNameExact(
-                facility.get().getId(),
-                firstName,
-                lastName
-        ).get();
-        Optional<Facility> facility2 = findFacilityByNameExact("San Jose");
-        assertThat(facility2.isPresent(), is(true));
-        assertThat(facility2.get().getId(), is(not(equalTo(facility.get().getId()))));
-        guest6.setFacilityId(facility2.get().getId());
-        assertThrows(NotUnique.class,
-                () -> banService.update(original.get().getId(), guest6));
+        Ban original = newBan(guest.get().getId());
+        final Ban inserted = banService.insert(original);
+
+        assertThrows(NotFound.class,
+                () -> banService.update(Long.MAX_VALUE, inserted));
 
     }
-*/
 
     // Support Methods -------------------------------------------------------
 

@@ -38,6 +38,7 @@ public abstract class AbstractServiceClient<M extends Model>
 
     // WebTarget path elements (relative to getBaseTarget())
     // for various model clients
+    public static final String BAN_PATH = "/bans";
     public static final String FACILITY_PATH = "/facilities";
     public static final String GUEST_PATH = "/guests";
     public static final String REGISTRATION_PATH = "/registrations";

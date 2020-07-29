@@ -249,6 +249,10 @@ public class BanService extends ModelService<Ban> {
     public Ban update(@NotNull Long banId, @NotNull Ban ban)
             throws BadRequest, InternalServerError, NotFound, NotUnique {
 
+        // NOTE:  Only the active, comments, and staff values
+        // can be updated.  Any other type of change requries
+        // inserting a new Ban object.
+
         Ban original = null;
 
         try {
@@ -256,20 +260,25 @@ public class BanService extends ModelService<Ban> {
             // Look up the original ban
             original = find(banId);
 
-            // Check from/to ordering
-            if (ban.getBanFrom().compareTo(ban.getBanTo()) > 0) {
-                throw new BadRequest("banFrom: Cannot be greater than banTo");
+            // Verify that only valid columns can be changed
+            if ((ban.getBanFrom() == null) ||
+                    !ban.getBanFrom().equals(original.getBanFrom())) {
+                throw new BadRequest("banFrom: Cannot be changed on an update");
+            }
+            if ((ban.getBanTo() == null) ||
+                    !ban.getBanTo().equals(original.getBanTo())) {
+                throw new BadRequest("banTo: Cannot be changed on an update");
+            }
+            if ((ban.getGuestId() == null) ||
+                    !ban.getGuestId().equals(original.getGuestId())) {
+                throw new BadRequest("guestId: Cannot be changed on an update");
             }
 
-            // Check valid guest
-            guestService.find(ban.getGuestId());
-
-            // TODO - Check overlap with existing bans (allow if this id)
-
             // Perform requested update
-            original = find(banId);
-            original.copy(ban);
             original.setUpdated(LocalDateTime.now());
+            original.setActive(ban.getActive());
+            original.setComments(ban.getComments());
+            original.setStaff(ban.getStaff());
             entityManager.merge(original);
             entityManager.flush();
 
