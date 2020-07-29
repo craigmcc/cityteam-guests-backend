@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
+import static org.cityteam.guests.model.Constants.GUEST_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.MAT_NUMBER_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_DATE_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_NAME;
@@ -99,6 +100,12 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
                         " ORDER BY r." + FACILITY_ID_COLUMN +
                         ", r." + REGISTRATION_DATE_COLUMN +
                         ", r." + MAT_NUMBER_COLUMN
+        ),
+        @NamedQuery(
+                name = REGISTRATION_NAME + ".findByGuestId",
+                query = "SELECT r FROM " + REGISTRATION_NAME + " r " +
+                        "WHERE r." + GUEST_ID_COLUMN + " =:" + GUEST_ID_COLUMN +
+                        " ORDER BY r." + REGISTRATION_DATE_COLUMN
         ),
         @NamedQuery(
                 name = REGISTRATION_NAME + ".findById",

@@ -47,6 +47,7 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.SEVERE;
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.FACILITY_NAME;
+import static org.cityteam.guests.model.Constants.GUEST_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.GUEST_NAME;
 import static org.cityteam.guests.model.Constants.MAT_NUMBER_COLUMN;
 import static org.cityteam.guests.model.Constants.REGISTRATION_DATE_COLUMN;
@@ -321,6 +322,26 @@ public class RegistrationService extends ModelService<Registration> {
             LOG.log(SEVERE,
                     String.format("findByFacilityAndDate(%d, %s)",
                             facilityId, registrationDate.toString()), e);
+            throw new InternalServerError(e.getMessage(), e);
+        }
+
+    }
+
+    public @NotNull List<Registration> findByGuestId(
+            @NotNull Long guestId)
+        throws InternalServerError {
+
+        try {
+
+            TypedQuery<Registration> query = entityManager.createNamedQuery
+                    (REGISTRATION_NAME + ".findByGuestId",
+                            Registration.class)
+                    .setParameter(GUEST_ID_COLUMN, guestId);
+            return query.getResultList();
+
+        } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("findByGuestId(%d)", guestId), e);
             throw new InternalServerError(e.getMessage(), e);
         }
 

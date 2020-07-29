@@ -15,7 +15,9 @@
  */
 package org.cityteam.guests.client;
 
+import org.cityteam.guests.model.Ban;
 import org.cityteam.guests.model.Guest;
+import org.cityteam.guests.model.Registration;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -27,6 +29,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 public class GuestClient extends AbstractServiceClient<Guest> {
@@ -87,6 +90,59 @@ public class GuestClient extends AbstractServiceClient<Guest> {
             throw new InternalServerError(response.readEntity(String.class));
         }
 
+    }
+
+    public @NotNull List<Ban> findBansByGuestId(@NotNull Long guestId)
+        throws InternalServerError {
+
+        Response response = guestTarget
+                .path(guestId.toString())
+                .path("/bans")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(new GenericType<List<Ban>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    public @NotNull Ban findBansByGuestIdAndRegistrationDate
+            (@NotNull Long guestId, @NotNull LocalDate registrationDate)
+        throws InternalServerError, NotFound {
+
+        Response response = guestTarget
+                .path(guestId.toString())
+                .path("/bans")
+                .path(registrationDate.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(Ban.class);
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    public @NotNull List<Registration> findRegistrationsByGuestId
+            (@NotNull Long guestId)
+            throws InternalServerError {
+
+        Response response = guestTarget
+                .path(guestId.toString())
+                .path("/registrations")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity
+                    (new GenericType<List<Registration>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
     }
 
     @Override

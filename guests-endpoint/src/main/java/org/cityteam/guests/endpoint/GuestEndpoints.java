@@ -15,8 +15,12 @@
  */
 package org.cityteam.guests.endpoint;
 
+import org.cityteam.guests.model.Ban;
 import org.cityteam.guests.model.Guest;
+import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.service.BanService;
 import org.cityteam.guests.service.GuestService;
+import org.cityteam.guests.service.RegistrationService;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -42,6 +46,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.time.LocalDate;
 
 @ApplicationScoped
 @Path("/guests")
@@ -52,8 +57,14 @@ public class GuestEndpoints {
     // Instance Variables ----------------------------------------------------
     
     @Inject
+    private BanService banService;
+
+    @Inject
     private GuestService guestService;
     
+    @Inject
+    private RegistrationService registrationService;
+
     // Endpoint Methods ------------------------------------------------------
 
     @DELETE
@@ -168,14 +179,111 @@ public class GuestEndpoints {
         }
     }
 
-    // GuestService.findByFacilityId() is handled by
-    // FacilityEndpoints.findGuestsByFacilityId()
+    @GET
+    @Path("/{guestId}/bans")
+    @Operation(description = "Find bans by guest ID.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Ban.class)
+                    ),
+                    description = "The found bans.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findBansByGuestId(
+            @Parameter(description = "ID of the guest for which to find bans.")
+            @PathParam("guestId") Long guestId
+    ) {
+        try {
+            return Response.ok(banService.findByGuestId(guestId)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
 
-    // GuestService.findByName() is handled by
-    // FacilityEndpoints.findGuestsByName()
+    @GET
+    @Path("/{guestId}/bans/{registrationDate}")
+    @Operation(description = "Find ban by guest ID and registrationDate (if any).")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Ban.class)
+                    ),
+                    description = "The found ban.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Not found message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findBansByGuestIdAndRegistrationDate(
+            @Parameter(description = "ID of the guest for which to find ban.")
+            @PathParam("guestId") Long guestId,
+            @Parameter(description = "Registration date for which to find ban.")
+            @PathParam("registrationDate") String registrationDate
+    ) {
+        try {
+            return Response.ok(banService.findByGuestIdAndRegistrationDate
+                    (guestId, LocalDate.parse(registrationDate))).build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
 
-    // GuestService.findByNameExact() is handled by
-    // FacilityEndpoints.findGuestsByNameExact()
+    @GET
+    @Path("/{guestId}/registrations")
+    @Operation(description = "Find registrations by guest ID.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Registration.class)
+                    ),
+                    description = "The found registrations.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findRegistrationsByGuestId(
+            @Parameter(description = "ID of the guest for which to find registrations.")
+            @PathParam("guestId") Long guestId
+    ) {
+        try {
+            return Response.ok(registrationService.findByGuestId(guestId)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
 
     @POST
     @Operation(description = "Insert a new guest.")
