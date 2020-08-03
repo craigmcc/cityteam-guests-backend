@@ -51,7 +51,7 @@ public class DevModeDepopulateService {
         depopulateRegistrations();
         depopulateBans();
         depopulateGuests();
-//        depopulateTemplates();
+        depopulateTemplates();
         depopulateFacilities();
         // Restart the sequence generator since we are reloading data
         // from scratch

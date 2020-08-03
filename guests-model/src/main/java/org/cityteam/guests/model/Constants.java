@@ -28,6 +28,10 @@ public interface Constants {
 
     String ADDRESS2_COLUMN = "address2";
 
+    String ALL_MATS_COLUMN = "allMats";
+    String ALL_MATS_VALIDATION_MESSAGE =
+            "allMats: Required and must not be blank";
+
     String BAN_FROM_COLUMN = "banFrom";
 
     String BAN_ID_COLUMN = "banId";
@@ -62,6 +66,8 @@ public interface Constants {
 
     String GUESTS_COLUMN = "guests";
 
+    String HANDICAP_MATS_COLUMN = "handicapMats";
+
     String LAST_NAME_COLUMN = "lastName";
     String LAST_NAME_VALIDATION_MESSAGE =
             "lastName: Required and must not be blank";
@@ -90,11 +96,15 @@ public interface Constants {
 
     String SHOWER_TIME_COLUMN = "showerTime";
 
+    String SOCKET_MATS_COLUMN = "socketMats";
+
     String STAFF_COLUMN = "staff";
 
     String STATE_COLUMN = "state";
 
     String TEMPLATE_ID_COLUMN = "templateId";
+
+    String TEMPLATES_COLUMN = "templates";
 
     String WAKEUP_TIME_COLUMN = "wakeupTime";
 

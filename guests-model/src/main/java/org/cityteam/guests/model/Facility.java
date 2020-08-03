@@ -74,7 +74,7 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
                 name = FACILITY_NAME + ".findByName",
                 query = "SELECT f FROM " + FACILITY_NAME + " f " +
                         "WHERE LOWER(f." + NAME_COLUMN +
-                        ") LIKE LOWER(CONCAT('%',:" + NAME_COLUMN + ",'%'))" +
+                        ") LIKE LOWER(CONCAT('%',:" + NAME_COLUMN + ",'%')) " +
                         "ORDER BY f." + NAME_COLUMN + " ASC"
         ),
         @NamedQuery(
@@ -164,7 +164,6 @@ public class Facility extends Model<Facility> implements Constants {
     @Schema(description = "State abbreviation of the address for this facility.")
     private String state;
 
-/*
     @OneToMany(
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY,
@@ -173,7 +172,6 @@ public class Facility extends Model<Facility> implements Constants {
 
     )
     private List<Template> templates;
-*/
 
     @Column(
             name = ZIPCODE_COLUMN,
@@ -290,6 +288,16 @@ public class Facility extends Model<Facility> implements Constants {
     public void setState(String state) {
         this.state = state;
     }
+
+/*
+    public List<Template> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<Template> templates) {
+        this.templates = templates;
+    }
+*/
 
     public String getZipCode() {
         return zipCode;

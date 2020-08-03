@@ -19,6 +19,7 @@ import org.cityteam.guests.model.Ban;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.model.Template;
 import org.cityteam.guests.model.types.FeatureType;
 import org.cityteam.guests.model.types.PaymentType;
 
@@ -65,6 +66,7 @@ public class DevModePopulateService {
         LOG.info("----- Populate Development Test Data Begin -----");
         // Populate data in order respecting dependencies
         populateFacilities();
+        populateTemplates();
         populateGuests();
         populateBans();
         populateRegistrations();
@@ -581,6 +583,97 @@ public class DevModePopulateService {
         );
 
         LOG.info("Populating registrations end");
+
+    }
+
+    private void populateTemplate(Template template) {
+        template.setPublished(LocalDateTime.now());
+        template.setUpdated(template.getPublished());
+        entityManager.persist(template);
+    }
+
+    private void populateTemplates() {
+
+        // Do not populate templates for facility "Portland"
+        LOG.info("Populating templates begin");
+
+        // Populate templates for facility "Chester"
+        Long facilityId1 = lookupFacility("Chester").getId();
+        populateTemplate(new Template(
+                "1-6",
+                "Chester COVID Template",
+                facilityId1,
+                "1,3",
+                "Chester COVID",
+                "3,5"
+        ));
+        populateTemplate(new Template(
+                "1-58",
+                "Chester Standard Template",
+                facilityId1,
+                "1,3",
+                "Chester Standard",
+                "3,5"
+        ));
+
+        // Populate templates for facility "Oakland"
+        Long facilityId2 = lookupFacility("Oakland").getId();
+        populateTemplate(new Template(
+                "1-3,4-6",
+                "Oakland COVID Template",
+                facilityId2,
+                "1-3",
+                "Oakland COVID",
+                "3-5"
+        ));
+        populateTemplate(new Template(
+                "1-58",
+                "Oakland Standard Template",
+                facilityId2,
+                "1-10,12",
+                "Oakland Standard",
+                "6-15"
+        ));
+
+        // Populate templates for facility "San Francisco"
+        Long facilityId3 = lookupFacility("San Francisco").getId();
+        populateTemplate(new Template(
+                "1-12",
+                "San Francisco COVID Template",
+                facilityId3,
+                "1,3",
+                "San Francisco COVID",
+                "3,5"
+        ));
+        populateTemplate(new Template(
+                "1-58",
+                "San Francisco Standard Template",
+                facilityId3,
+                "1,3",
+                "San Francisco Standard",
+                "3,5"
+        ));
+
+        // Populate templates for facility "San Jose"
+        Long facilityId4 = lookupFacility("San Jose").getId();
+        populateTemplate(new Template(
+                "1-24",
+                "San Jose COVID Template",
+                facilityId4,
+                "1,9-10,21",
+                "San Jose COVID",
+                "17-18,22-23"
+        ));
+        populateTemplate(new Template(
+                "1-58",
+                "San Jose Standard Template",
+                facilityId4,
+                "1,9-10,21,30-31,34-35,43,54-55,58",
+                "San Jose Standard",
+                "17-18,22-23,30-31,36-37,42,53-54,57-58"
+        ));
+
+        LOG.info("Populating templates end");
 
     }
 
