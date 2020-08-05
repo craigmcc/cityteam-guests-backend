@@ -42,6 +42,7 @@ public abstract class AbstractServiceClient<M extends Model>
     public static final String FACILITY_PATH = "/facilities";
     public static final String GUEST_PATH = "/guests";
     public static final String REGISTRATION_PATH = "/registrations";
+    public static final String TEMPLATE_PATH = "/templates";
 
     // Public Methods --------------------------------------------------------
 

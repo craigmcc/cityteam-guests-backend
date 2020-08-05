@@ -20,6 +20,7 @@ import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.model.Template;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -249,6 +250,103 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
         if (response.getStatus() == RESPONSE_OK) {
             return response.readEntity
                     (new GenericType<List<Registration>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a list of {@link Template} objects for the specified
+     * facility, ordered by name.</p>
+     *
+     * @param facilityId ID of the facility for which to retrieve guests
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull List<Template> findTemplatesByFacilityId
+    (@NotNull Long facilityId)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/templates")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(
+                    new GenericType<List<Template>>() {
+                    }
+            );
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a list of {@link Template} objects for the specified
+     * facility, matching the specified name segment,
+     * ordered by name.</p>
+     *
+     * @param facilityId ID of the facility for which to retrieve templates
+     * @param name Name segment for which to retrieve templates
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull List<Template> findTemplatesByName(
+            @NotNull Long facilityId,
+            @NotNull String name)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/templates")
+                .path("/name")
+                .path(name)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(
+                    new GenericType<List<Template>>() {
+                    }
+            );
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
+     * <p>Return a {@link Template} objects for the specified
+     * facility, matching the specified name.
+     *
+     * @param facilityId ID of the facility for which to retrieve template
+     * @param name Name for which to retrieve template
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     * @throws NotFound If specified facilityId is not found
+     */
+    public @NotNull Template findTemplatesByNameExact(
+            @NotNull Long facilityId,
+            @NotNull String name)
+            throws InternalServerError, NotFound {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/templates")
+                .path("/nameExact")
+                .path(name)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(Template.class);
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
         } else {
             throw new InternalServerError(response.readEntity(String.class));
         }

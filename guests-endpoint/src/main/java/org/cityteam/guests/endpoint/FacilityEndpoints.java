@@ -20,9 +20,11 @@ import org.cityteam.guests.action.ImportResults;
 import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Guest;
 import org.cityteam.guests.model.Registration;
+import org.cityteam.guests.model.Template;
 import org.cityteam.guests.service.FacilityService;
 import org.cityteam.guests.service.GuestService;
 import org.cityteam.guests.service.RegistrationService;
+import org.cityteam.guests.service.TemplateService;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -69,6 +71,9 @@ public class FacilityEndpoints {
 
     @Inject
     private RegistrationService registrationService;
+
+    @Inject
+    private TemplateService templateService;
 
     // Endpoint Methods ------------------------------------------------------
 
@@ -485,6 +490,124 @@ public class FacilityEndpoints {
                     .build();
         } catch (NotUnique e) {
             return Response.status(Response.Status.CONFLICT)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/templates")
+    @Operation(description = "Find templates for this facility " +
+            "ordered by name.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Template.class)
+                    ),
+                    description = "The found templates.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findTemplatesByFacilityId(
+            @Parameter(description =
+                    "Facility ID for which to find templates.")
+            @PathParam("facilityId") Long facilityId
+    ) {
+        try {
+            return Response.ok(templateService.findByFacilityId(facilityId))
+                    .build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/templates/name/{name}")
+    @Operation(description = "Find templates for this facility " +
+            "matching name segment, " +
+            "ordered by name.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Template.class)
+                    ),
+                    description = "The found templates.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findTemplatesByName(
+            @Parameter(description =
+                    "Facility ID for which to find templates.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description =
+                    "Name segment match for templates to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(templateService.findByName
+                    (facilityId, name)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET()
+    @Path("/{facilityId}/templates/nameExact/{name}")
+    @Operation(description = "Find guest for this facility " +
+            "matching name exactly.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Template.class)
+                    ),
+                    description = "The found template.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing template message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findTemplatesByNameExact(
+            @Parameter(description =
+                    "Facility ID for which to find template.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "Name of template to find.")
+            @PathParam("name") String name
+    ) {
+        try {
+            return Response.ok(templateService.findByNameExact
+                    (facilityId, name)).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
                     .build();
