@@ -15,7 +15,9 @@
  */
 package org.cityteam.guests.endpoint;
 
+import org.checkerframework.framework.qual.PostconditionAnnotation;
 import org.cityteam.guests.model.Facility;
+import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.Template;
 import org.cityteam.guests.service.RegistrationService;
 import org.cityteam.guests.service.TemplateService;
@@ -45,6 +47,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 
 @ApplicationScoped
 @Path("/templates")
@@ -168,6 +171,73 @@ public class TemplateEndpoints {
             return Response.ok(templateService.findAll()).build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/{templateId}/registrations/{registrationDate}")
+    @Operation(description = "Generate unassigned registrations for the " +
+                             "specified template ID and registration date.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Registration.class)
+                    ),
+                    description = "The generated registrations.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Bad request message.",
+                    responseCode = "400"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Missing template message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Uniqueness conflict message.",
+                    responseCode = "409"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response generate(
+            @Parameter(description = "Template ID for which to " +
+                                     "generate registrations.")
+            @PathParam("templateId") Long templateId,
+            @Parameter(description = "Registration date for which to " +
+                                     "generate registrations")
+            @PathParam("registrationDate") String registrationDate
+    ) {
+        try {
+            return Response.ok(templateService.generate
+                    (templateId, LocalDate.parse(registrationDate))).build();
+        } catch (BadRequest e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotUnique e) {
+            return Response.status(Response.Status.CONFLICT)
                     .entity(e.getMessage())
                     .type(MediaType.TEXT_PLAIN)
                     .build();

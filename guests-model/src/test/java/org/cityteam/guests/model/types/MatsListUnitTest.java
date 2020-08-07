@@ -38,6 +38,10 @@ public class MatsListUnitTest {
             "1,-2",
     };
 
+    private String cannotHaveDuplicateSingleNumberLists[] = {
+            "2,2"
+    };
+
     private String mustNotContainAnEmptyItemSingleNumberLists[] = {
             "",
             "3,,5",
@@ -182,6 +186,19 @@ public class MatsListUnitTest {
             } catch (IllegalArgumentException e) {
                 assertThat(e.getMessage(),
                         endsWith("cannot be blank"));
+            }
+        }
+    }
+
+    @Test
+    public void setHaveDuplicateSingleNumberLists() {
+        for (String list : cannotHaveDuplicateSingleNumberLists) {
+            try {
+                new MatsList(list);
+                fail("Should have failed for '" + list + "'");
+            } catch (IllegalArgumentException e) {
+                assertThat(e.getMessage(),
+                        endsWith("is out of ascending order"));
             }
         }
     }

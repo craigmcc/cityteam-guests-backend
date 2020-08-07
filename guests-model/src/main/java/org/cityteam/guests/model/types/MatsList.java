@@ -35,8 +35,11 @@ public class MatsList {
 
     // Constructors ---------------------------------------------------------
 
-    public MatsList(@NotNull String list) throws IllegalArgumentException {
-        explode(list);
+    // Null means an empty list
+    public MatsList(String list) throws IllegalArgumentException {
+        if (list != null) {
+            explode(list);
+        }
     }
 
     // Instance Variables ----------------------------------------------------

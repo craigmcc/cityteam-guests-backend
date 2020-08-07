@@ -15,6 +15,7 @@
  */
 package org.cityteam.guests.client;
 
+import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.Template;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.InternalServerError;
@@ -27,6 +28,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 public class TemplateClient extends AbstractServiceClient<Template> {
@@ -87,6 +89,48 @@ public class TemplateClient extends AbstractServiceClient<Template> {
             throw new InternalServerError(response.readEntity(String.class));
         }
 
+    }
+
+    /**
+     * <p>For the given templateId and registrationDate, create and return
+     * a list of unassigned {@link Registration} objects, in preparation
+     * for checking in nightly guests.</p>
+     *
+     * @param templateId ID of the template used as the basis for
+     *                   generating {@link Registration} objects
+     * @param registrationDate Date for which to generate
+     *                         {@link Registration} objects
+     *
+     * @return List of generated {@link Registration} objects
+     *
+     * @throws BadRequest If one or more registrations already exist for
+     *                    the specified registration date and corresponding
+     *                    facility
+     * @throws InternalServerError If a server side processing error occurs
+     * @throws NotFound If no template with the specified ID can be found
+     * @throws NotUnique If attempting to add the same mat number twice
+     */
+    public @NotNull List<Registration> generate
+            (@NotNull Long templateId, @NotNull LocalDate registrationDate)
+        throws BadRequest, InternalServerError, NotFound, NotUnique {
+
+        Response response = templateTarget
+                .path("/" + templateId)
+                .path("/registrations")
+                .path("/" + registrationDate.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(null));
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(new GenericType<>() {});
+        } else if (response.getStatus() == RESPONSE_BAD_REQUEST) {
+            throw new BadRequest(response.readEntity(String.class));
+        } else if (response.getStatus() == RESPONSE_NOT_FOUND) {
+            throw new NotFound(response.readEntity(String.class));
+        } else if (response.getStatus() == RESPONSE_CONFLICT) {
+            throw new NotUnique(response.readEntity(String.class));
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
     }
 
     @Override

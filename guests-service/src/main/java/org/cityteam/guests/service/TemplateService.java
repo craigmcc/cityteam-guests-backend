@@ -15,7 +15,9 @@
  */
 package org.cityteam.guests.service;
 
+import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.Template;
+import org.cityteam.guests.model.types.FeatureType;
 import org.cityteam.guests.model.types.MatsList;
 import org.craigmcc.library.model.ModelService;
 import org.craigmcc.library.shared.exception.BadRequest;
@@ -25,6 +27,7 @@ import org.craigmcc.library.shared.exception.NotUnique;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -32,6 +35,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +47,6 @@ import static org.cityteam.guests.model.Constants.NAME_COLUMN;
 import static org.cityteam.guests.model.Constants.TEMPLATE_NAME;
 import static org.craigmcc.library.model.Constants.ID_COLUMN;
 
-// TODO - Generate and Ungenerate for templateId/registrationDate
-
 @LocalBean
 @Stateless
 public class TemplateService extends ModelService<Template> {
@@ -53,6 +55,9 @@ public class TemplateService extends ModelService<Template> {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Inject
+    private RegistrationService registrationService;
 
     // Static Variables ------------------------------------------------------
 
@@ -193,6 +198,68 @@ public class TemplateService extends ModelService<Template> {
                             e.getMessage()), e);
             throw new InternalServerError(e.getMessage(), e);
         }
+
+    }
+
+    /**
+     * <p>For the given templateId and registrationDate, create and return
+     * a list of unassigned {@link Registration} objects, in preparation
+     * for checking in nightly guests.</p>
+     *
+     * @param templateId ID of the template used as the basis for
+     *                   generating {@link Registration} objects
+     * @param registrationDate Date for which to generate
+     *                         {@link Registration} objects
+     *
+     * @return List of generated {@link Registration} objects
+     *
+     * @throws BadRequest If one or more registrations already exist for
+     *                    the specified registration date and corresponding
+     *                    facility
+     * @throws InternalServerError If a server side processing error occurs
+     * @throws NotFound If no template with the specified ID can be found
+     * @throws NotUnique If attempting to add the same mat number twice
+     */
+    public List<Registration> generate
+            (@NotNull Long templateId, @NotNull LocalDate registrationDate)
+        throws BadRequest, InternalServerError, NotFound, NotUnique {
+
+        Template template = find(templateId);
+        List<Registration> registrations =
+                registrationService.findByFacilityAndDate
+                        (template.getFacilityId(), registrationDate);
+        if (registrations.size() > 0) {
+            throw new BadRequest("registrationDate: At least one " +
+                    "registration for this date already exists");
+        }
+        MatsList allMats = new MatsList(template.getAllMats());
+        MatsList handicapMats = new MatsList(template.getHandicapMats());
+        MatsList socketMats = new MatsList(template.getSocketMats());
+
+        for (Integer matNumber : allMats.exploded()) {
+
+            List<FeatureType> features = new ArrayList<>();
+            if (handicapMats.isMemberOf(matNumber)) {
+                features.add(FeatureType.H);
+            }
+            if (socketMats.isMemberOf(matNumber)) {
+                features.add(FeatureType.S);
+            }
+            if (features.size() == 0) {
+                features = null;
+            }
+
+            Registration registration = new Registration(
+                    template.getFacilityId(),
+                    features,
+                    matNumber,
+                    registrationDate
+            );
+            registrations.add(registrationService.insert(registration));
+
+        }
+
+        return registrations;
 
     }
 

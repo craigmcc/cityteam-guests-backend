@@ -16,6 +16,7 @@
 package org.cityteam.guests.service;
 
 import org.cityteam.guests.model.Facility;
+import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.Template;
 import org.craigmcc.library.shared.exception.BadRequest;
 import org.craigmcc.library.shared.exception.NotFound;
@@ -35,27 +36,25 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.FACILITY_NAME;
-import static org.cityteam.guests.model.Constants.FIRST_NAME_COLUMN;
-import static org.cityteam.guests.model.Constants.TEMPLATE_NAME;
-import static org.cityteam.guests.model.Constants.LAST_NAME_COLUMN;
 import static org.cityteam.guests.model.Constants.NAME_COLUMN;
 import static org.cityteam.guests.model.Constants.TEMPLATE_NAME;
+import static org.cityteam.guests.model.types.FeatureType.H;
+import static org.cityteam.guests.model.types.FeatureType.S;
 import static org.craigmcc.library.model.Constants.ID_COLUMN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
 
 @Category(ServiceTests.class)
 @RunWith(Arquillian.class)
@@ -67,6 +66,9 @@ public class TemplateServiceTest extends AbstractServiceTest {
     public static JavaArchive createDeployment() {
         JavaArchive archive = ShrinkWrap.create
                 (JavaArchive.class, "testTemplate.jar")
+                .addClass(FacilityService.class)
+                .addClass(GuestService.class)
+                .addClass(RegistrationService.class)
                 .addClass(TemplateService.class);
         addServiceFixtures(archive, false);
         System.out.println("TemplateServiceTest: Assembled Archive:");
@@ -82,6 +84,9 @@ public class TemplateServiceTest extends AbstractServiceTest {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Inject
+    RegistrationService registrationService;
 
     @Inject
     TemplateService templateService;
@@ -311,6 +316,81 @@ public class TemplateServiceTest extends AbstractServiceTest {
                         facility.get().getId(),
                         "Oakland Standard")
         );
+
+    }
+
+    // generate() tests
+
+    @Test
+    public void generateHappy() throws Exception {
+
+        String facilityName = "San Francisco";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+        String templateName = "San Francisco COVID";
+        Optional<Template> template = findTemplateByNameExact
+                (facility.get().getId(), templateName);
+        assertThat(template.isPresent(), is(true));
+
+        LocalDate registrationDate = LocalDate.parse("2020-07-05");
+        List<Registration> registrations = templateService.generate
+                (template.get().getId(), registrationDate);
+        assertThat(registrations.size(), is(equalTo(12)));
+
+        for (Registration registration : registrations) {
+            assertThat(registration.getComments(), is(nullValue()));
+            assertThat(registration.getFacilityId(),
+                    is(equalTo(facility.get().getId())));
+            if (registration.getMatNumber() == 1) {
+                assertThat(registration.getFeatures().contains(H),
+                        is(true));
+            } else if (registration.getMatNumber() == 3) {
+                assertThat(registration.getFeatures().contains(H),
+                        is(true));
+                assertThat(registration.getFeatures().contains(S),
+                        is(true));
+            } else if (registration.getMatNumber() == 5) {
+                assertThat(registration.getFeatures().contains(S),
+                        is(true));
+            } else {
+                assertThat(registration.getFeatures(), is(nullValue()));
+            }
+            assertThat(registration.getGuestId(), is(nullValue()));
+            assertThat(registration.getMatNumber(), is(notNullValue()));
+            assertThat(registration.getPaymentAmount(), is(nullValue()));
+            assertThat(registration.getPaymentType(), is(nullValue()));
+            assertThat(registration.getShowerTime(), is(nullValue()));
+            assertThat(registration.getWakeupTime(), is(nullValue()));
+            assertThat(registration.getRegistrationDate(),
+                    is(equalTo(registrationDate)));
+        }
+
+    }
+
+    @Test
+    public void generateBadRequest() throws Exception {
+
+        String facilityName = "San Francisco";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+        String templateName = "San Francisco COVID";
+        Optional<Template> template = findTemplateByNameExact
+                (facility.get().getId(), templateName);
+        assertThat(template.isPresent(), is(true));
+
+        // Force at least one mat for this registrationDate
+        LocalDate registrationDate = LocalDate.parse("2020-07-06");
+        Registration registration = new Registration(
+                facility.get().getId(),
+                null,
+                1,
+                registrationDate
+        );
+        registrationService.insert(registration);
+
+        assertThrows(BadRequest.class,
+                () -> templateService.generate
+                        (template.get().getId(), registrationDate));
 
     }
 
