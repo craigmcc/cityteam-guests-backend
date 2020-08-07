@@ -19,6 +19,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.cityteam.guests.model.Constants;
 import org.cityteam.guests.model.types.PaymentType;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -29,10 +30,10 @@ import static org.cityteam.guests.model.Constants.ASSIGN_NAME;
 // API Documentation ---------------------------------------------------------
 
 @Schema(
-        description = "Properties passed to assign a Registration to a " +
-                      "particular Guest.  Only guestId is required.  This " +
-                      "is the only way an unassigned Registration can " +
-                      "receive information about a Guest being assigned " +
+        description = "Properties passed to assign a registration to a " +
+                      "particular guest.  This " +
+                      "is the only way an unassigned registration can " +
+                      "receive information about a guest being assigned " +
                       "to it.",
         name = ASSIGN_NAME
 )
@@ -44,14 +45,20 @@ public class Assign implements Constants {
     @Schema(description = "Optional comments about this registration.")
     private String comments;
 
-    @Schema(description = "ID of the guest this registration is assigned to.")
+    @Schema(
+            description = "ID of the guest this registration is assigned to.",
+            required = true
+    )
     private Long guestId;
 
     @Schema(description = "Payment amount for this registration.  Only " +
             "required for payment type $$ (cash).")
     private BigDecimal paymentAmount;
 
-    @Schema(description = "Type of payment for this registration.")
+    @Schema(
+            description = "Type of payment for this registration.",
+            required = true
+    )
     private PaymentType paymentType;
 
     @Schema(description = "Time this guest wishes to be awoken " +

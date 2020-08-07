@@ -87,7 +87,8 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
 // API Documentation ---------------------------------------------------------
 
 @Schema(
-        description = "An individual CityTeam facility that schedules its own overnight guests.",
+        description = "An individual CityTeam facility that schedules " +
+                "its own overnight guests.",
         name = FACILITY_NAME
 )
 
@@ -138,7 +139,10 @@ public class Facility extends Model<Facility> implements Constants {
             name = NAME_COLUMN,
             nullable = false
     )
-    @Schema(description = "Unique name of this facility.")
+    @Schema(
+            description = "Unique name of this facility.",
+            required = true
+    )
     private String name;
 
     @Column(

@@ -23,6 +23,7 @@ import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -49,7 +50,12 @@ import java.net.URI;
 @Path("/registrations")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Registration Endpoints")
+@Tag(
+        description = "CRUD operations for managing registrations of " +
+                "a particular guest, within a particular facility, " +
+                "for a particular registrationDate and matNumber.",
+        name = "Registration Endpoints"
+)
 public class RegistrationEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -95,8 +101,7 @@ public class RegistrationEndpoints {
             @Parameter(description = "ID of the registration to be assigned.")
             @PathParam("registrationId") Long registrationId,
             @Parameter(
-                    description = "Properties for this assignment. " +
-                                  "Only guestId is required.",
+                    description = "Properties for this assignment.",
                     name = "assign",
                     schema = @Schema(implementation = Assign.class)
             )
@@ -135,7 +140,7 @@ public class RegistrationEndpoints {
 
     @POST
     @Path("/{registrationId}/deassign")
-    @Operation(description = "Deassign a guest to the specified registration.")
+    @Operation(description = "Deassign a guest from the specified registration.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -191,7 +196,7 @@ public class RegistrationEndpoints {
 
     @DELETE
     @Path("/{registrationId}")
-    @Operation(description = "Delete registration by ID.")
+    @Operation(description = "Delete a registration by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -233,7 +238,7 @@ public class RegistrationEndpoints {
 
     @GET
     @Path("/{registrationId}")
-    @Operation(description = "Find registration by ID.")
+    @Operation(description = "Find a registration by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -254,7 +259,7 @@ public class RegistrationEndpoints {
             )
     })
     public Response find(
-            @Parameter(description = "ID of registration to find.")
+            @Parameter(description = "ID of the registration to find.")
             @PathParam("registrationId") Long registrationId
     ) {
         try {
@@ -279,7 +284,8 @@ public class RegistrationEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Registration.class)
+                            implementation = Registration.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found registrations.",
                     responseCode = "200"
@@ -303,7 +309,7 @@ public class RegistrationEndpoints {
 
     @POST
     @Operation(description = "Insert a new registration.  Only unassigned " +
-        "registrations can be created in this manner.")
+        "registrations (no guestId) can be created in this manner.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -364,7 +370,9 @@ public class RegistrationEndpoints {
 
     @PUT
     @Path("/{registrationId}")
-    @Operation(description = "Update an existing registration.")
+    @Operation(description = "Update an existing registration. " +
+                             "This operation is not supported - use the " +
+                             "assign and deassign operations to modify.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(mediaType = MediaType.TEXT_PLAIN),

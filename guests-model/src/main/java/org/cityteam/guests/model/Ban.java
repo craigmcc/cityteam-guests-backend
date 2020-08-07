@@ -103,7 +103,8 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
 // API Documentation ---------------------------------------------------------
 
 @Schema(
-        description = "A date range for which a particular guest is banned.",
+        description = "A date range for which a particular guest is banned. " +
+            "Bans for a particular guest cannot have overlapping date ranges.",
         name = BAN_NAME
 )
 
@@ -115,22 +116,32 @@ public class Ban extends Model<Ban> implements Constants{
             name = ACTIVE_COLUMN,
             nullable = false
     )
-    @Schema(description = "Flag indicating this ban is active and should " +
-            "be enforced.")
+    @Schema(
+            description = "Flag indicating this ban is active and should " +
+                "be enforced.",
+            required = true
+    )
     private Boolean active;
 
     @Column(
             name = BAN_FROM_COLUMN,
             nullable = false
     )
-    @Schema(description = "First date (inclusive) of this ban.")
+    @Schema(
+            description = "First date (inclusive) of this ban.",
+            required = true
+    )
     private LocalDate banFrom;
 
     @Column(
             name = BAN_TO_COLUMN,
             nullable = false
     )
-    @Schema(description = "Last date (inclusive) of this ban.")
+    @Schema(
+            description = "Last date (inclusive) of this ban.  Must be " +
+                "greater than or equal to banFrom date.",
+            required = true
+    )
     private LocalDate banTo;
 
     @Column(
@@ -154,18 +165,17 @@ public class Ban extends Model<Ban> implements Constants{
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(
-            description = "Details of the guest " +
-                " this ban is associated with.",
-            hidden = true
-    )
+    @Schema(hidden = true)
     private Guest guest;
 
     @Column(
             name = GUEST_ID_COLUMN,
             nullable = false
     )
-    @Schema(description = "ID of the guest this ban is associated with.")
+    @Schema(
+            description = "ID of the guest this ban is associated with.",
+            required = true
+    )
     private Long guestId;
 
     @Column(

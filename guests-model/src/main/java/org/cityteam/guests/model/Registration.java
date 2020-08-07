@@ -117,8 +117,9 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
 // API Documentation ---------------------------------------------------------
 
 @Schema(
-        description = "Overnight registration of a guest for a particular mat, " +
-                      "on a particular date, in a particular facility.",
+        description = "Availability of an overnight registration of a " +
+                "particular matNumber, on a particular registrationDate, " +
+                "within a particular facility.",
         name = REGISTRATION_NAME
 )
 
@@ -147,11 +148,7 @@ public class Registration extends Model<Registration> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(
-            description = "Details of the facility this guest " +
-                " and registration is associated with.",
-            hidden = true
-    )
+    @Schema(hidden = true)
     private Facility facility;
 
     @Column(
@@ -159,7 +156,8 @@ public class Registration extends Model<Registration> implements Constants {
             nullable = false
     )
     @NotNull(message = FACILITY_ID_VALIDATION_MESSAGE)
-    @Schema(description = "ID of the facility to which this guest belongs.")
+    @Schema(description = "ID of the facility to which this " +
+                "registration belongs.")
     private Long facilityId;
 
     @Column(
@@ -186,11 +184,7 @@ public class Registration extends Model<Registration> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(
-            description = "Details of the guest " +
-                " this registration is associated with.",
-            hidden = true
-    )
+    @Schema(hidden = true)
     private Guest guest;
 
     @Column(
@@ -205,8 +199,11 @@ public class Registration extends Model<Registration> implements Constants {
             name = MAT_NUMBER_COLUMN,
             nullable = false
     )
-    @Schema(description = "Unique (per registrationDate) mat number " +
-                          "for this registration.")
+    @Schema(
+            description = "Unique (per registrationDate) mat number " +
+                          "for this registration.",
+            required = true
+    )
     private Integer matNumber;
 
     @Column(
@@ -222,7 +219,8 @@ public class Registration extends Model<Registration> implements Constants {
             nullable = true
     )
     @Enumerated(EnumType.STRING)
-    @Schema(description = "Type of payment for this registration.")
+    @Schema(description = "Type of payment for this registration. " +
+                "This is required when a registration is assigned.")
     private PaymentType paymentType;
 
     @Column(
@@ -230,6 +228,11 @@ public class Registration extends Model<Registration> implements Constants {
             nullable = false
     )
     @NotNull(message = REGISTRATION_DATE_VALIDATION_MESSAGE)
+    @Schema(
+            description = "Date on which this mat may be registered " +
+                "to a particular guest.  The combination of facilityId, " +
+                "registrationDate, and matNumber must be unique.",
+            required = true)
     private LocalDate registrationDate;
 
     @Column(

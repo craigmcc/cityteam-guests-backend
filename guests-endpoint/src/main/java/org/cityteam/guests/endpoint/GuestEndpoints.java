@@ -26,6 +26,7 @@ import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -53,7 +54,12 @@ import java.time.LocalDate;
 @Path("/guests")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Guest Endpoints")
+@Tag(
+        description = "CRUD operations for managing overnight guests " +
+                "of a particular CityTeam facility.  Guests within a " +
+                "facility must have a unique firstName/lastName combination.",
+        name = "Guest Endpoints"
+)
 public class GuestEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -71,7 +77,7 @@ public class GuestEndpoints {
 
     @DELETE
     @Path("/{guestId}")
-    @Operation(description = "Delete guest by ID.")
+    @Operation(description = "Delete a guest by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -92,7 +98,7 @@ public class GuestEndpoints {
             )
     })
     public Response delete(
-            @Parameter(description = "ID of guest to delete.")
+            @Parameter(description = "ID of the guest to delete.")
             @PathParam("guestId") Long guestId
     ) {
         try {
@@ -113,7 +119,7 @@ public class GuestEndpoints {
 
     @GET
     @Path("/{guestId}")
-    @Operation(description = "Find guest by ID.")
+    @Operation(description = "Find a guest by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -134,7 +140,7 @@ public class GuestEndpoints {
             )
     })
     public Response find(
-            @Parameter(description = "ID of guest to find.")
+            @Parameter(description = "ID of the guest to find.")
             @PathParam("guestId") Long guestId
     ) {
         try {
@@ -159,7 +165,8 @@ public class GuestEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Guest.class)
+                            implementation = Guest.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found guests.",
                     responseCode = "200"
@@ -183,11 +190,12 @@ public class GuestEndpoints {
 
     @GET
     @Path("/{guestId}/bans")
-    @Operation(description = "Find bans by guest ID.")
+    @Operation(description = "Find bans by guest ID, ordered by fromDate.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Ban.class)
+                            implementation = Ban.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found bans.",
                     responseCode = "200"
@@ -214,7 +222,7 @@ public class GuestEndpoints {
 
     @GET
     @Path("/{guestId}/bans/{registrationDate}")
-    @Operation(description = "Find ban by guest ID and registrationDate (if any).")
+    @Operation(description = "Find any ban by guest ID and registrationDate.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -258,11 +266,13 @@ public class GuestEndpoints {
 
     @GET
     @Path("/{guestId}/registrations")
-    @Operation(description = "Find registrations by guest ID.")
+    @Operation(description = "Find all registrations by guest ID, ordered " +
+            "by registrationDate.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Registration.class)
+                            implementation = Registration.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found registrations.",
                     responseCode = "200"
@@ -315,7 +325,7 @@ public class GuestEndpoints {
     })
     public Response insert(
             @Parameter(
-                    description = "guest to be inserted.",
+                    description = "Guest to be inserted.",
                     name = "guest",
                     schema = @Schema(implementation = Guest.class)
             )

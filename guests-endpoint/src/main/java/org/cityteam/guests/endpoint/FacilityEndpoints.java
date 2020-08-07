@@ -30,12 +30,14 @@ import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.logging.Param;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -58,7 +60,12 @@ import java.util.List;
 @Path("/facilities")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Facility Endpoints")
+@Tag(
+        description = "CRUD operations for managing separate CityTeam " +
+                "facilities, that each have their own guests, " +
+                "registrations, and templates.",
+        name = "Facility Endpoints"
+)
 public class FacilityEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -79,7 +86,7 @@ public class FacilityEndpoints {
 
     @DELETE
     @Path("/{facilityId}")
-    @Operation(description = "Delete facility by ID.")
+    @Operation(description = "Delete a facility by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -100,7 +107,7 @@ public class FacilityEndpoints {
             )
     })
     public Response delete(
-            @Parameter(description = "ID of facility to delete.")
+            @Parameter(description = "ID of the facility to delete.")
             @PathParam("facilityId") Long facilityId
     ) {
         try {
@@ -121,7 +128,7 @@ public class FacilityEndpoints {
 
     @GET
     @Path("/{facilityId}")
-    @Operation(description = "Find facility by ID.")
+    @Operation(description = "Find a facility by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -142,7 +149,7 @@ public class FacilityEndpoints {
             )
     })
     public Response find(
-            @Parameter(description = "ID of facility to find.")
+            @Parameter(description = "ID of the facility to find.")
             @PathParam("facilityId") Long facilityId
     ) {
         try {
@@ -166,7 +173,8 @@ public class FacilityEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Facility.class)
+                            implementation = Facility.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found facilities.",
                     responseCode = "200"
@@ -190,11 +198,13 @@ public class FacilityEndpoints {
 
     @GET
     @Path("/name/{name}")
-    @Operation(description = "Find facilities matching name segment.")
+    @Operation(description = "Find all facilities matching name segment, " +
+            "ordered by name.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Facility.class)
+                            implementation = Facility.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found facilities.",
                     responseCode = "200"
@@ -221,13 +231,13 @@ public class FacilityEndpoints {
 
     @GET
     @Path("/nameExact/{name}")
-    @Operation(description = "Find facilities matching an exact name.")
+    @Operation(description = "Find the facility matching an exact name.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
                             implementation = Facility.class)
                     ),
-                    description = "The found facilities.",
+                    description = "The found facility.",
                     responseCode = "200"
             ),
             @APIResponse(
@@ -242,7 +252,7 @@ public class FacilityEndpoints {
             )
     })
     public Response findByNameExact(
-            @Parameter(description = "Name matching facility to find.")
+            @Parameter(description = "Name matching the facility to find.")
             @PathParam("name") String name
     ) {
         try {
@@ -267,7 +277,8 @@ public class FacilityEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Guest.class)
+                            implementation = Guest.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found guests.",
                     responseCode = "200"
@@ -301,7 +312,8 @@ public class FacilityEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Guest.class)
+                            implementation = Guest.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found guests.",
                     responseCode = "200"
@@ -331,14 +343,14 @@ public class FacilityEndpoints {
 
     @GET()
     @Path("/{facilityId}/guests/nameExact/{firstName}/{lastName}")
-    @Operation(description = "Find guest for this facility " +
+    @Operation(description = "Find the guest for this facility " +
             "matching firstName and lastName exactly.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
                             implementation = Guest.class)
                     ),
-                    description = "The found guests.",
+                    description = "The found guest.",
                     responseCode = "200"
             ),
             @APIResponse(
@@ -353,11 +365,11 @@ public class FacilityEndpoints {
             )
     })
     public Response findGuestsByNameExact(
-            @Parameter(description = "Facility ID for which to find guest.")
+            @Parameter(description = "Facility ID for which to find the guest.")
             @PathParam("facilityId") Long facilityId,
-            @Parameter(description = "First name of guest to find.")
+            @Parameter(description = "First name of the guest to find.")
             @PathParam("firstName") String firstName,
-            @Parameter(description = "Last name of guest to find.")
+            @Parameter(description = "Last name of the guest to find.")
             @PathParam("lastName") String lastName
     ) {
         try {
@@ -378,12 +390,13 @@ public class FacilityEndpoints {
 
     @GET
     @Path("/{facilityId}/registrations/{registrationDate}")
-    @Operation(description = "Find registrations by facility and " +
-            "registration date.")
+    @Operation(description = "Find registrations for a facility and " +
+            "specific registration date, ordered by matNumber.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Registration.class)
+                            implementation = Registration.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found registrations.",
                     responseCode = "200"
@@ -456,6 +469,7 @@ public class FacilityEndpoints {
             @Parameter(description = "Registration date for which to " +
                     "import registrations.")
             @PathParam("registrationDate") String registrationDate,
+            @Parameter(description = "List of imports to process.")
             @Parameter List<ImportRequest> importRequests
     ) {
         try {
@@ -498,12 +512,13 @@ public class FacilityEndpoints {
 
     @GET()
     @Path("/{facilityId}/templates")
-    @Operation(description = "Find templates for this facility " +
+    @Operation(description = "Find templates for this facility, " +
             "ordered by name.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Template.class)
+                            implementation = Template.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found templates.",
                     responseCode = "200"
@@ -538,7 +553,8 @@ public class FacilityEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Template.class)
+                            implementation = Template.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found templates.",
                     responseCode = "200"
@@ -570,8 +586,8 @@ public class FacilityEndpoints {
 
     @GET()
     @Path("/{facilityId}/templates/nameExact/{name}")
-    @Operation(description = "Find guest for this facility " +
-            "matching name exactly.")
+    @Operation(description = "Find the template for this facility " +
+            "matching the specified name exactly.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(

@@ -117,8 +117,11 @@ public class Template extends Model<Template> implements Constants {
             name = ALL_MATS_COLUMN,
             nullable = false
     )
-    @Schema(description = "List of all mat numbers to be generated " +
-            "from this template")
+    @Schema(
+            description = "List of all mat numbers to be generated " +
+                "from this template",
+            required = true
+    )
     @NotEmpty(message = ALL_MATS_VALIDATION_MESSAGE)
     private String allMats;
 
@@ -143,11 +146,7 @@ public class Template extends Model<Template> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(
-            description = "Details of the facility this template " +
-                "   is associated with.",
-            hidden = true
-    )
+    @Schema(hidden = true)
     private Facility facility;
 
     @Column(
@@ -155,7 +154,10 @@ public class Template extends Model<Template> implements Constants {
             nullable = false
     )
     @NotNull(message = FACILITY_ID_VALIDATION_MESSAGE)
-    @Schema(description = "ID of the facility to which this template belongs.")
+    @Schema(
+            description = "ID of the facility to which this template belongs.",
+            required = true
+    )
     private Long facilityId;
 
     @Column(
@@ -171,8 +173,11 @@ public class Template extends Model<Template> implements Constants {
             nullable = false
     )
     @NotEmpty(message = NAME_VALIDATION_MESSAGE)
-    @Schema(description = "Name of this template. " +
-            "Must be unique within a facility.")
+    @Schema(
+            description = "Name of this template. " +
+                    "Must be unique within a facility.",
+            required = true
+    )
     private String name;
 
     @Column(

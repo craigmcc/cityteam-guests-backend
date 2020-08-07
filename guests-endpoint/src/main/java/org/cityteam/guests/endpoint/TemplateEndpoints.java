@@ -24,6 +24,7 @@ import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -51,7 +52,12 @@ import java.time.LocalDate;
 @Path("/templates")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Template Endpoints")
+@Tag(
+        description = "CRUD operations for managing templates used to " +
+                "generate registrations for a particular facility and " +
+                "registrationDate.",
+        name = "Template Endpoints"
+)
 public class TemplateEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -59,14 +65,11 @@ public class TemplateEndpoints {
     @Inject
     private TemplateService templateService;
 
-    @Inject
-    private RegistrationService registrationService;
-
     // Endpoint Methods ------------------------------------------------------
 
     @DELETE
     @Path("/{templateId}")
-    @Operation(description = "Delete template by ID.")
+    @Operation(description = "Delete a template by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -87,7 +90,7 @@ public class TemplateEndpoints {
             )
     })
     public Response delete(
-            @Parameter(description = "ID of template to delete.")
+            @Parameter(description = "ID of the template to delete.")
             @PathParam("templateId") Long templateId
     ) {
         try {
@@ -108,7 +111,7 @@ public class TemplateEndpoints {
 
     @GET
     @Path("/{templateId}")
-    @Operation(description = "Find template by ID.")
+    @Operation(description = "Find a template by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -129,7 +132,7 @@ public class TemplateEndpoints {
             )
     })
     public Response find(
-            @Parameter(description = "ID of template to find.")
+            @Parameter(description = "ID of the template to find.")
             @PathParam("templateId") Long templateId
     ) {
         try {
@@ -154,7 +157,8 @@ public class TemplateEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Template.class)
+                            implementation = Template.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found templates.",
                     responseCode = "200"
@@ -183,7 +187,8 @@ public class TemplateEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Registration.class)
+                            implementation = Registration.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The generated registrations.",
                     responseCode = "200"

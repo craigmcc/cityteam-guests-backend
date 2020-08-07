@@ -22,6 +22,7 @@ import org.craigmcc.library.shared.exception.InternalServerError;
 import org.craigmcc.library.shared.exception.NotFound;
 import org.craigmcc.library.shared.exception.NotUnique;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -48,7 +49,12 @@ import java.net.URI;
 @Path("/bans")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "Ban Endpoints")
+@Tag(
+        description = "CRUD operations for managing banning of a " +
+                "particular guest (of a particular facility) " +
+                "for a specified date range.",
+        name = "Ban Endpoints"
+)
 public class BanEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -60,7 +66,7 @@ public class BanEndpoints {
 
     @DELETE
     @Path("/{banId}")
-    @Operation(description = "Delete ban by ID.")
+    @Operation(description = "Delete a ban by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -81,7 +87,7 @@ public class BanEndpoints {
             )
     })
     public Response delete(
-            @Parameter(description = "ID of ban to delete.")
+            @Parameter(description = "ID of the ban to delete.")
             @PathParam("banId") Long banId
     ) {
         try {
@@ -102,7 +108,7 @@ public class BanEndpoints {
 
     @GET
     @Path("/{banId}")
-    @Operation(description = "Find ban by ID.")
+    @Operation(description = "Find a ban by ID.")
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
@@ -123,7 +129,7 @@ public class BanEndpoints {
             )
     })
     public Response find(
-            @Parameter(description = "ID of ban to find.")
+            @Parameter(description = "ID of the ban to find.")
             @PathParam("banId") Long banId
     ) {
         try {
@@ -147,7 +153,8 @@ public class BanEndpoints {
     @APIResponses(value = {
             @APIResponse(
                     content = @Content(schema = @Schema(
-                            implementation = Ban.class)
+                            implementation = Ban.class,
+                            type = SchemaType.ARRAY)
                     ),
                     description = "The found bans.",
                     responseCode = "200"
@@ -197,7 +204,7 @@ public class BanEndpoints {
     })
     public Response insert(
             @Parameter(
-                    description = "ban to be inserted.",
+                    description = "Ban to be inserted.",
                     name = "ban",
                     schema = @Schema(implementation = Ban.class)
             )

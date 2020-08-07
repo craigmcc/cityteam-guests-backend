@@ -155,11 +155,7 @@ public class Guest extends Model<Guest> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(
-            description = "Details of the facility this guest " +
-                "   is associated with.",
-            hidden = true
-    )
+    @Schema(hidden = true)
     private Facility facility;
 
     @Column(
@@ -167,7 +163,10 @@ public class Guest extends Model<Guest> implements Constants {
             nullable = false
     )
     @NotNull(message = FACILITY_ID_VALIDATION_MESSAGE)
-    @Schema(description = "ID of the facility to which this guest belongs.")
+    @Schema(
+            description = "ID of the facility to which this guest belongs.",
+            required = true
+    )
     private Long facilityId;
 
     @Column(
@@ -175,8 +174,11 @@ public class Guest extends Model<Guest> implements Constants {
             nullable = false
     )
     @NotEmpty(message = FIRST_NAME_VALIDATION_MESSAGE)
-    @Schema(description = "First name of this guest. " +
-        "First name and last name must be unique within a facility.")
+    @Schema(
+            description = "First name of this guest. " +
+                "First name and last name must be unique within a facility.",
+            required = true
+    )
     private String firstName;
 
     @Column(
@@ -184,8 +186,11 @@ public class Guest extends Model<Guest> implements Constants {
             nullable = false
     )
     @NotEmpty(message = LAST_NAME_VALIDATION_MESSAGE)
-    @Schema(description = "Last name of this guest. " +
-        "First name and last name must be unique within a facility.")
+    @Schema(
+            description = "Last name of this guest. " +
+                "First name and last name must be unique within a facility.",
+            required = true
+    )
     private String lastName;
 
     @OneToMany(
