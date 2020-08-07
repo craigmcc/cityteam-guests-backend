@@ -100,6 +100,10 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      * name segment, ordered by name.</p>
      *
      * @param name The name segment to be matched
+     *
+     * @return List of {@link Facility} objects matching this name segment
+     *
+     * @throws InternalServerError If an internal server error has occurred
      */
     public @NotNull List<Facility> findByName(@NotNull String name)
             throws InternalServerError {
@@ -143,6 +147,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      *
      * @param facilityId ID of the facility for which to retrieve guests
      *
+     * @return List of {@link Guest} objects for this facility
+     *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found
      */
@@ -173,6 +179,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      *
      * @param facilityId ID of the facility for which to retrieve guests
      * @param name Name segment for which to retrieve guests
+     *
+     * @return List of {@link Guest} objects for this facility
      *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found
@@ -209,6 +217,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      * @param facilityId ID of the facility for which to retrieve guest
      * @param firstName First name for which to retrieve guest
      * @param lastName Last name for which to retrieve guest
+     *
+     * @return Matching {@link Guest} object
      *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found
@@ -262,6 +272,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      *
      * @param facilityId ID of the facility for which to retrieve guests
      *
+     * @return List of {@link Template} objects for this facility
+     *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found
      */
@@ -292,6 +304,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      *
      * @param facilityId ID of the facility for which to retrieve templates
      * @param name Name segment for which to retrieve templates
+     *
+     * @return List of matching {@link Template} objects
      *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found
@@ -327,6 +341,8 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
      *
      * @param facilityId ID of the facility for which to retrieve template
      * @param name Name for which to retrieve template
+     *
+     * @return The specified {@link Template}, if found
      *
      * @throws InternalServerError If an internal server error has occurred
      * @throws NotFound If specified facilityId is not found

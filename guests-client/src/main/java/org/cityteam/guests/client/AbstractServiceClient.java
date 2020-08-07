@@ -80,7 +80,7 @@ public abstract class AbstractServiceClient<M extends Model>
      * <p>Retrieve and return all {@link Model} objects of the specified
      * type.</p>
      *
-     * @return The matching {@Model} objects.
+     * @return The matching {@link Model} objects.
      *
      * @throws InternalServerError If a server level error has occurred.
      */

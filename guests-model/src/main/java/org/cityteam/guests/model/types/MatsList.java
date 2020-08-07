@@ -51,6 +51,8 @@ public class MatsList {
 
     /**
      * <p>Return the exploded set of mat numbers.</p>
+     *
+     * @return List of included mat numbers (ascending order)
      */
     public List<Integer> exploded() {
         return exploded;
@@ -58,6 +60,10 @@ public class MatsList {
 
     /**
      * <p>Is the specified mat number included in this list?</p>
+     *
+     * @param matNumber Mat number to be checked for inclusion
+     *
+     * @return true If the specified mat number is included in this MatsList
      */
     public boolean isMemberOf(int matNumber) {
         for (Integer item : exploded) {
@@ -71,6 +77,10 @@ public class MatsList {
     /**
      * <p>Is this mats list a subset (or exact match) of the
      * specified mats list?</p>
+     *
+     * @param that MatsList we are checking to be a subset of
+     *
+     * @return true If the this MatsList is a subset of that list
      */
     public boolean isSubsetOf(MatsList that) {
         for (Integer item : exploded) {
@@ -101,6 +111,8 @@ public class MatsList {
      * <code>highest</code>.</p>
      *
      * @param list String containing list of mat numbers and ranges
+     *
+     * @return Exploded list of included mat numbers (ascending order)
      */
     private List<Integer> explode(String list)
             throws IllegalArgumentException {
@@ -155,6 +167,8 @@ public class MatsList {
      * an exception if this item cannot be converted.</p>
      *
      * @param item String item to be converted and validated
+     *
+     * @return Validated integer value
      */
     private int validated(String item) {
         String trimmed = item.trim();

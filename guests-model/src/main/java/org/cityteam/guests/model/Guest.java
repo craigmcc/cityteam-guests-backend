@@ -340,6 +340,8 @@ public class Guest extends Model<Guest> implements Constants {
      * <strong>OR</strong> condition.</p>
      *
      * @param name Matching pattern, optionally with a space to separate last from first
+     *
+     * @return true if the specified name matches
      */
     public boolean matchNames(@NotBlank String name) {
         if ((name == null) || (name.isBlank())) {

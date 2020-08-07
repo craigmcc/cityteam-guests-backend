@@ -96,6 +96,8 @@ public abstract class AbstractClient {
      * <p>Acquire the {@link WebTarget} for the base URI for the
      * <code>guests-endpoint</code> endpoints of the
      * CityTeam Guests Application.</p>
+     *
+     * @return Configured {@link WebTarget} object
      */
     public synchronized WebTarget getBaseTarget() {
         if (baseTarget == null) {
@@ -119,6 +121,8 @@ public abstract class AbstractClient {
      * <p>Acquire the {@link Client} implementation for accessing the
      * <code>guests-endpoint</code> endpoints of the
      * CityTeam Guests Application.</p>
+     *
+     * @return Configured {@link Client} object
      */
     public synchronized Client getClient() {
         if (client == null) {
