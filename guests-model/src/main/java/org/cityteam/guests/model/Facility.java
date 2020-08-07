@@ -155,6 +155,7 @@ public class Facility extends Model<Facility> implements Constants {
             orphanRemoval = true
 
     )
+    @Schema(hidden = true)
     private List<Registration> registrations;
 
     @Column(
@@ -171,6 +172,7 @@ public class Facility extends Model<Facility> implements Constants {
             orphanRemoval = true
 
     )
+    @Schema(hidden = true)
     private List<Template> templates;
 
     @Column(

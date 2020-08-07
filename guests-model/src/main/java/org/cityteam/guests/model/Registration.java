@@ -147,8 +147,11 @@ public class Registration extends Model<Registration> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(description = "Details of the facility this guest " +
-            " and registration is associated with.")
+    @Schema(
+            description = "Details of the facility this guest " +
+                " and registration is associated with.",
+            hidden = true
+    )
     private Facility facility;
 
     @Column(
@@ -183,8 +186,11 @@ public class Registration extends Model<Registration> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(description = "Details of the guest " +
-            " this registration is associated with.")
+    @Schema(
+            description = "Details of the guest " +
+                " this registration is associated with.",
+            hidden = true
+    )
     private Guest guest;
 
     @Column(

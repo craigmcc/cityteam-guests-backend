@@ -155,8 +155,11 @@ public class Guest extends Model<Guest> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(description = "Details of the facility this guest " +
-            "   is associated with.")
+    @Schema(
+            description = "Details of the facility this guest " +
+                "   is associated with.",
+            hidden = true
+    )
     private Facility facility;
 
     @Column(
@@ -192,6 +195,7 @@ public class Guest extends Model<Guest> implements Constants {
             orphanRemoval = true
 
     )
+    @Schema(hidden = true)
     private List<Registration> registrations;
 
     // Static Classes --------------------------------------------------------

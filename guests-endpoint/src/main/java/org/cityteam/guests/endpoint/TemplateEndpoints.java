@@ -15,8 +15,6 @@
  */
 package org.cityteam.guests.endpoint;
 
-import org.checkerframework.framework.qual.PostconditionAnnotation;
-import org.cityteam.guests.model.Facility;
 import org.cityteam.guests.model.Registration;
 import org.cityteam.guests.model.Template;
 import org.cityteam.guests.service.RegistrationService;
@@ -31,6 +29,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -47,12 +46,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
 
 @ApplicationScoped
 @Path("/templates")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Template Endpoints")
 public class TemplateEndpoints {
 
     // Instance Variables ----------------------------------------------------

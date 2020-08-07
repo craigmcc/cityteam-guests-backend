@@ -154,8 +154,11 @@ public class Ban extends Model<Ban> implements Constants{
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(description = "Details of the guest " +
-            " this ban is associated with.")
+    @Schema(
+            description = "Details of the guest " +
+                " this ban is associated with.",
+            hidden = true
+    )
     private Guest guest;
 
     @Column(

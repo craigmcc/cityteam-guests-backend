@@ -143,8 +143,11 @@ public class Template extends Model<Template> implements Constants {
             referencedColumnName = ID_COLUMN,
             updatable = false
     )
-    @Schema(description = "Details of the facility this template " +
-            "   is associated with.")
+    @Schema(
+            description = "Details of the facility this template " +
+                "   is associated with.",
+            hidden = true
+    )
     private Facility facility;
 
     @Column(

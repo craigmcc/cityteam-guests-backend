@@ -18,6 +18,8 @@ package org.cityteam.guests.endpoint;
 import org.cityteam.guests.service.DevModeDepopulateService;
 import org.cityteam.guests.service.DevModePopulateService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -35,6 +37,7 @@ import javax.ws.rs.core.Response;
  */
 @ApplicationScoped()
 @Path("/devmode")
+// @Tag(name = "Dev Mode Endpoints")
 public class DevModeEndpoints {
 
     // Instance Variables ----------------------------------------------------
@@ -57,6 +60,7 @@ public class DevModeEndpoints {
 
     @POST
     @Path("/depopulate")
+    @Operation(hidden = true)
     public Response depopulate() {
         if (devModeDepopulate) {
             devModeDepopulateService.depopulate();
@@ -71,6 +75,7 @@ public class DevModeEndpoints {
 
     @POST
     @Path("/populate")
+    @Operation(hidden = true)
     public Response populate() {
         if (devModePopulate) {
             devModePopulateService.populate();

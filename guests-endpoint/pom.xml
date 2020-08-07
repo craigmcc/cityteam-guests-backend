@@ -105,6 +105,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Microprofile OpenAPI UI Extension -->
+        <dependency>
+            <groupId>org.microprofile-ext.openapi-ext</groupId>
+            <artifactId>openapi-ui</artifactId>
+        </dependency>
+
         <!-- Uses Jackson for JSON Pretty Printing -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
