@@ -37,7 +37,6 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.Param;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -113,6 +112,64 @@ public class FacilityEndpoints {
         try {
             Facility facility = facilityService.delete(facilityId);
             return Response.ok(facility).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        } catch (NotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/{facilityId}/registrations/{registrationDate}")
+    @Operation(description = "Delete registrations for a facility and " +
+            "specific registration date, but only if none are assigned.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Registration.class,
+                            type = SchemaType.ARRAY)
+                    ),
+                    description = "The deleted registrations.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "At least one assigned registration message.",
+                    responseCode = "400"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "No registrations found message.",
+                    responseCode = "404"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response deleteRegistrationsByFacilityAndDate(
+            @Parameter(description = "Facility ID for which to delete " +
+                    "registrations.")
+            @PathParam("facilityId") Long facilityId,
+            @Parameter(description = "Registration date for which to " +
+                    "delete registrations.")
+            @PathParam("registrationDate") String registrationDate
+    ) {
+        try {
+            return Response.ok(registrationService.deleteByFacilityAndDate
+                    (facilityId, LocalDate.parse(registrationDate))).build();
+        } catch (BadRequest e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())

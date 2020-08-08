@@ -35,6 +35,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
@@ -256,6 +257,77 @@ public class RegistrationService extends ModelService<Registration> {
         throw new NotFound(
                 String.format("registrationId: Missing registration %d",
                         registrationId));
+
+    }
+
+    /**
+     * <p>Delete all {@link Registration} objects for the specified
+     * facilityId and registrationDate, but only if none of the affected
+     * registrations have had guests assigned to them.</p>
+     *
+     * @param facilityId ID of facility for which to delete registrations
+     * @param registrationDate Registration date for which to delete
+     *                         registrations
+     *
+     * @return The deleted registrations
+     *
+     * @throws BadRequest At least one registration that would be deleted
+     *                    has been assigned to a guest already
+     * @throws InternalServerError An internal server error has occurred
+     * @throws NotFound No registrations exist for the specified facilityId
+     *                  and registrationDate
+     */
+    public @NotNull List<Registration> deleteByFacilityAndDate(
+            @NotNull Long facilityId, @NotNull LocalDate registrationDate)
+            throws BadRequest, InternalServerError, NotFound {
+
+        try {
+
+            // Get a list of the registrations to be deleted
+            TypedQuery<Registration> query = entityManager.createNamedQuery
+                    (REGISTRATION_NAME + ".findByFacilityAndDate",
+                            Registration.class)
+                    .setParameter(FACILITY_ID_COLUMN, facilityId)
+                    .setParameter(REGISTRATION_DATE_COLUMN,
+                            registrationDate);
+            List<Registration> registrations = query.getResultList();
+
+            // Validate the list contents
+            if (registrations.size() < 1) {
+                throw new NotFound("registrationDate: No registrations " +
+                        "exist for the specified facility and date");
+            }
+            LocalDateTime updated = LocalDateTime.now();
+            for (Registration registration : registrations) {
+                if (registration.getGuestId() != null) {
+                    throw new BadRequest("registrationDate: At least one " +
+                            "registration has already been assigned");
+                }
+                registration.setUpdated(updated);
+            }
+
+            // Delete the entire set of registrations
+            // and return the original list
+            Query query2 = entityManager.createNamedQuery
+                    (REGISTRATION_NAME + ".deleteByFacilityAndDate")
+                    .setParameter(FACILITY_ID_COLUMN, facilityId)
+                    .setParameter(REGISTRATION_DATE_COLUMN, registrationDate);
+            int deletedCount = query2.executeUpdate();
+            if (deletedCount != registrations.size()) {
+                throw new InternalServerError("delete: Found " +
+                        registrations.size() +
+                        " registrations but only deleted " + deletedCount);
+            }
+            return registrations;
+
+        } catch (BadRequest|InternalServerError|NotFound e) {
+            throw e;
+        } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("deleteByFacilityAndDate(%d, %s)",
+                            facilityId, registrationDate.toString()), e);
+            throw new InternalServerError(e.getMessage(), e);
+        }
 
     }
 

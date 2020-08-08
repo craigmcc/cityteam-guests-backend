@@ -62,6 +62,25 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
 
     }
 
+    public @NotNull List<Registration> deleteRegistrationsByFacilityAndDate
+            (@NotNull Long facilityId, @NotNull LocalDate registrationDate)
+            throws InternalServerError {
+
+        Response response = facilityTarget
+                .path(facilityId.toString())
+                .path("/registrations")
+                .path(registrationDate.toString())
+                .request(MediaType.APPLICATION_JSON)
+                .delete();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity
+                    (new GenericType<List<Registration>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
     @Override
     public @NotNull Facility find(@NotNull Long facilityId)
             throws InternalServerError, NotFound {

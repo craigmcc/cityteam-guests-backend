@@ -380,6 +380,62 @@ public class RegistrationServiceTest extends AbstractServiceTest {
 
     }
 
+    // deleteByFacilityAndDate() tests
+
+    @Test
+    public void deleteByFacilityAndDateHappy() throws Exception {
+
+        String facilityName = "Chester";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+        LocalDate registrationDate = LocalDate.parse("2020-07-04");
+
+        List<Registration> registrations =
+                registrationService.findByFacilityAndDate
+                        (facility.get().getId(), registrationDate);
+        assertThat(registrations.size(), is(greaterThan(0)));
+
+        for (Registration registration : registrations) {
+            if (registration.getGuestId() != null) {
+                registrationService.deassign(registration.getId());
+            }
+        }
+
+        List<Registration> results =
+                registrationService.deleteByFacilityAndDate
+                        (facility.get().getId(), registrationDate);
+        assertThat(results.size(), is(equalTo(registrations.size())));
+
+    }
+
+    @Test
+    public void deleteByFacilityAndDateBadRequest() throws Exception {
+
+        String facilityName = "Oakland";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+        LocalDate registrationDate = LocalDate.parse("2020-07-04");
+
+        assertThrows(BadRequest.class,
+                () -> registrationService.deleteByFacilityAndDate
+                        (facility.get().getId(), registrationDate));
+
+    }
+
+    @Test
+    public void deleteByFacilityAndDateNotFound() throws Exception {
+
+        String facilityName = "San Jose";
+        Optional<Facility> facility = findFacilityByNameExact(facilityName);
+        assertThat(facility.isPresent(), is(true));
+        LocalDate registrationDate = LocalDate.parse("2020-12-31");
+
+        assertThrows(NotFound.class,
+                () -> registrationService.deleteByFacilityAndDate
+                        (facility.get().getId(), registrationDate));
+
+    }
+
     // find() tests
 
     @Test

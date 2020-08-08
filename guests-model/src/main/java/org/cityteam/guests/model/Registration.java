@@ -76,6 +76,12 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
 
 @NamedQueries({
         @NamedQuery(
+                name = REGISTRATION_NAME + ".deleteByFacilityAndDate",
+                query = "DELETE FROM " + REGISTRATION_NAME + " r " +
+                        "WHERE r." + FACILITY_ID_COLUMN + " = :" + FACILITY_ID_COLUMN +
+                        " AND r." + REGISTRATION_DATE_COLUMN + " = :" + REGISTRATION_DATE_COLUMN
+        ),
+        @NamedQuery(
                 name = REGISTRATION_NAME + ".findAll",
                 query = "SELECT r FROM " + REGISTRATION_NAME + " r " +
                         "ORDER BY r." + FACILITY_ID_COLUMN +
