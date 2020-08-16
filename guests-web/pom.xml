@@ -21,7 +21,7 @@
 
     <!-- Build Configuration -->
     <build>
-        <finalName>guests</finalName>
+        <finalName>guests-backend</finalName>
         <!-- TODO - Use appropriate plugin to create a fat jar -->
     </build>
 
