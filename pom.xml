@@ -28,13 +28,13 @@
     </parent>
 
     <groupId>org.cityteam.guests</groupId>
-    <artifactId>guests</artifactId>
+    <artifactId>cityteam-guests-backend</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Guests Application</name>
+    <name>Guests Backend Application</name>
     <description>
-        Parent POM for CityTeam Guests Application.
+        Parent POM for CityTeam Guests Backend Application.
     </description>
 
     <!-- Build Configuration -->

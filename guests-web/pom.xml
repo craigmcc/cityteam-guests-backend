@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>guests</artifactId>
+        <artifactId>cityteam-guests-backend</artifactId>
         <groupId>org.cityteam.guests</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
@@ -16,7 +16,7 @@
     <name>Guests Web</name>
     <description>
         Web application assembly and UI resources for the
-        CityTeam Guests application.
+        CityTeam Guests Backend Application.
     </description>
 
     <!-- Build Configuration -->
