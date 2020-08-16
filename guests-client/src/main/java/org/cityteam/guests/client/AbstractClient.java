@@ -35,7 +35,7 @@ public abstract class AbstractClient {
      * <p>Default for base URI if not specified.</p>
      */
     public static final String DEFAULT_BASE_URI =
-            "http://localhost:8080/guests/api";
+            "http://localhost:8080/guests-backend/api";
 
     /**
      * <p>System property containing the base URI (including context path
