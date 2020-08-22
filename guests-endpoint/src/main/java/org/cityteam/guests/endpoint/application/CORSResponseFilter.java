@@ -39,6 +39,7 @@ public class CORSResponseFilter implements ContainerResponseFilter {
                 responseContext.getHeaders();
         // TODO - might need to narrow some of these down
         headers.add("Access-Control-Allow-Headers", "*");
+        headers.add("Access-Control-Allow-Methods", "*");
         headers.add("Access-Control-Allow-Origin", "*");
 
     }
