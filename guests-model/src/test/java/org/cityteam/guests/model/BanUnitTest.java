@@ -39,9 +39,9 @@ public class BanUnitTest {
                 .withIgnoredFields(PUBLISHED_COLUMN, UPDATED_COLUMN,
                         VERSION_COLUMN, GUEST_COLUMN)
                 .withPrefabValues(Facility.class,
-                        new Facility(null, null, null, null, "First",
+                        new Facility(null, null, null, null, null, "First",
                                 null, null, null),
-                        new Facility(null, null, null, null, "Second",
+                        new Facility(null, null, null, null, null, "Second",
                                 null, null, null)
                 )
                 .withPrefabValues(Guest.class,

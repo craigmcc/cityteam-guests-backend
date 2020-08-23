@@ -55,9 +55,9 @@ public class GuestUnitTest {
                                 null, 2L, null)
                         )
                 .withPrefabValues(Facility.class,
-                        new Facility(null, null, null, null, "First",
+                        new Facility(null, null, null, null, null, "First",
                                 null, null, null),
-                        new Facility(null, null, null, null, "Second",
+                        new Facility(null, null, null, null, null, "Second",
                                 null, null, null)
                         )
                 .withPrefabValues(Registration.class,

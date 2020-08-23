@@ -254,6 +254,37 @@ public class FacilityEndpoints {
     }
 
     @GET
+    @Path("/active")
+    @Operation(description = "Find all active facilities, " +
+            "ordered by name.")
+    @APIResponses(value = {
+            @APIResponse(
+                    content = @Content(schema = @Schema(
+                            implementation = Facility.class,
+                            type = SchemaType.ARRAY)
+                    ),
+                    description = "The found facilities.",
+                    responseCode = "200"
+            ),
+            @APIResponse(
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN),
+                    description = "Internal server error message.",
+                    responseCode = "500"
+            )
+    })
+    public Response findByActive()
+    {
+        try {
+            return Response.ok(facilityService.findByActive()).build();
+        } catch (InternalServerError e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+    }
+
+    @GET
     @Path("/name/{name}")
     @Operation(description = "Find all facilities matching name segment, " +
             "ordered by name.")

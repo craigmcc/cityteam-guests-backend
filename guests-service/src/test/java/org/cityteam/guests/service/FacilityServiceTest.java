@@ -169,6 +169,27 @@ public class FacilityServiceTest extends AbstractServiceTest {
 
     }
 
+    // findByActive() tests
+
+    @Test
+    public void findByActiveHappy() throws Exception {
+
+        List<Facility> facilities =
+                facilityService.findByActive();
+        assertThat(facilities.size(), is(greaterThan(0)));
+
+        String previousName = null;
+        for (Facility facility : facilities) {
+            String thisName = facility.getName();
+            assertThat(facility.getActive(), is(true));
+            if (previousName != null) {
+                assertThat(thisName, is(greaterThan(previousName)));
+            }
+            previousName = thisName;
+        }
+
+    }
+
     // findByName() tests
 
     @Test
@@ -335,6 +356,7 @@ public class FacilityServiceTest extends AbstractServiceTest {
 
     private Facility newFacility() {
         return new Facility(
+                true,
                 "123 New Street",
                 null,
                 "New City",

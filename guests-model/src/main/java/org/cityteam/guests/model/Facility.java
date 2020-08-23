@@ -37,6 +37,7 @@ import javax.persistence.Table;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.cityteam.guests.model.Constants.ACTIVE_COLUMN;
 import static org.cityteam.guests.model.Constants.FACILITY_NAME;
 import static org.cityteam.guests.model.Constants.FACILITY_TABLE;
 import static org.cityteam.guests.model.Constants.NAME_COLUMN;
@@ -63,6 +64,12 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
         @NamedQuery(
                 name = FACILITY_NAME + ".findAll",
                 query = "SELECT f FROM " + FACILITY_NAME + " f " +
+                        "ORDER BY f." + NAME_COLUMN + " ASC"
+        ),
+        @NamedQuery(
+                name = FACILITY_NAME + ".findByActive",
+                query = "SELECT f FROM " + FACILITY_NAME + " f " +
+                        "WHERE f." + ACTIVE_COLUMN + " = true " +
                         "ORDER BY f." + NAME_COLUMN + " ASC"
         ),
         @NamedQuery(
@@ -95,6 +102,17 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
 public class Facility extends Model<Facility> implements Constants {
 
     // Instance Variables ----------------------------------------------------
+
+    @Column(
+            name = ACTIVE_COLUMN,
+            nullable = false
+    )
+    @Schema(
+            description =
+                "Flag indicating whether this facility is active or not.",
+            required = true
+    )
+    private Boolean active;
 
     @Column(
             name = ADDRESS1_COLUMN,
@@ -198,6 +216,7 @@ public class Facility extends Model<Facility> implements Constants {
     public Facility() { }
 
     public Facility(
+            Boolean active,
             String address1,
             String address2,
             String city,
@@ -207,6 +226,7 @@ public class Facility extends Model<Facility> implements Constants {
             String state,
             String zipCode
     ) {
+        this.active = active;
         this.address1 = address1;
         this.address2 = address2;
         this.city = city;
@@ -218,6 +238,14 @@ public class Facility extends Model<Facility> implements Constants {
     }
 
     // Property Methods ------------------------------------------------------
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     public String getAddress1() {
         return address1;
@@ -317,6 +345,7 @@ public class Facility extends Model<Facility> implements Constants {
 
     @Override
     public void copy(Facility that) {
+        this.active = that.active;
         this.address1 = that.address1;
         this.address2 = that.address2;
         this.city = that.city;
@@ -335,6 +364,7 @@ public class Facility extends Model<Facility> implements Constants {
         Facility that = (Facility) object;
         return new EqualsBuilder()
                 .appendSuper(super.equals(that))
+                .append(this.active, that.active)
                 .append(this.address1, that.address1)
                 .append(this.address2, that.address2)
                 .append(this.city, that.city)
@@ -350,6 +380,7 @@ public class Facility extends Model<Facility> implements Constants {
     public int hashCode() {
         return new HashCodeBuilder()
                 .appendSuper(super.hashCode())
+                .append(this.active)
                 .append(this.address1)
                 .append(this.address2)
                 .append(this.city)
@@ -376,6 +407,7 @@ public class Facility extends Model<Facility> implements Constants {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .appendSuper(super.toString())
+                .append(ACTIVE_COLUMN, this.active)
                 .append(ADDRESS1_COLUMN, this.address1)
                 .append(ADDRESS2_COLUMN, this.address2)
                 .append(CITY_COLUMN, this.city)

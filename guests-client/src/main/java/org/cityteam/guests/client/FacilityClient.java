@@ -115,6 +115,29 @@ public class FacilityClient extends AbstractServiceClient<Facility> {
     }
 
     /**
+     * <p>Return a list of active {@link Facility} objects,
+     * ordered by name.</p>
+     *
+     * @return List of {@link Facility} active objects
+     *
+     * @throws InternalServerError If an internal server error has occurred
+     */
+    public @NotNull List<Facility> findByActive()
+            throws InternalServerError {
+
+        Response response = facilityTarget
+                .path("/active")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+        if (response.getStatus() == RESPONSE_OK) {
+            return response.readEntity(new GenericType<List<Facility>>() {});
+        } else {
+            throw new InternalServerError(response.readEntity(String.class));
+        }
+
+    }
+
+    /**
      * <p>Return a list of {@link Facility} objects matching the specified
      * name segment, ordered by name.</p>
      *

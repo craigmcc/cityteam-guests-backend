@@ -176,6 +176,7 @@ public class DevModePopulateService {
     }
 
     private void populateFacility(
+            Boolean active,
             String address1,
             String address2,
             String city,
@@ -186,6 +187,7 @@ public class DevModePopulateService {
             String zipCode
     ) {
         Facility facility = new Facility(
+                active,
                 address1,
                 address2,
                 city,
@@ -204,6 +206,7 @@ public class DevModePopulateService {
     private void populateFacilities() {
         LOG.info("Populating facilities begin");
         populateFacility(
+                true,
                 "634 Sproul Street",
                 null,
                 "Chester",
@@ -214,6 +217,18 @@ public class DevModePopulateService {
                 "19013"
         );
         populateFacility(
+                false,
+                null,
+                null,
+                null,
+                null,
+                "Inactive",
+                null,
+                null,
+                null
+        );
+        populateFacility(
+                true,
                 "722 Washington St.",
                 null,
                 "Oakland",
@@ -224,6 +239,7 @@ public class DevModePopulateService {
                 "94607"
         );
         populateFacility(
+                true,
                 "526 SE Grand Ave.",
                 null,
                 "Portland",
@@ -234,6 +250,7 @@ public class DevModePopulateService {
                 "97214"
         );
         populateFacility(
+                true,
                 "164 6th Street",
                 null,
                 "San Francisco",
@@ -244,6 +261,7 @@ public class DevModePopulateService {
                 "94103"
         );
         populateFacility(
+                true,
                 "2306 Zanker Road",
                 null,
                 "San Jose",

@@ -124,6 +124,23 @@ public class FacilityService extends ModelService<Facility> {
 
     }
 
+    public @NotNull List<Facility> findByActive()
+            throws InternalServerError {
+
+        try {
+
+            TypedQuery<Facility> query = entityManager.createNamedQuery
+                    (FACILITY_NAME + ".findByActive", Facility.class);
+            return query.getResultList();
+
+        } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("findByActive(): %s", e.getMessage()), e);
+            throw new InternalServerError(e.getMessage(), e);
+        }
+
+    }
+
     public @NotNull List<Facility> findByName(@NotNull String name)
             throws InternalServerError {
 
