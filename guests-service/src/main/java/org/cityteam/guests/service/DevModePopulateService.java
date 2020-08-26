@@ -612,7 +612,6 @@ public class DevModePopulateService {
 
     private void populateTemplates() {
 
-        // Do not populate templates for facility "Portland"
         LOG.info("Populating templates begin");
 
         // Populate templates for facility "Chester"
@@ -651,6 +650,25 @@ public class DevModePopulateService {
                 "1-10,12",
                 "Oakland Standard",
                 "6-15"
+        ));
+
+        // Populate templates for facility "Portland"
+        Long facilityIdPortland = lookupFacility("Portland").getId();
+        populateTemplate(new Template(
+                "1-24",
+                "Portland COVID Template",
+                facilityIdPortland,
+                "1,9-10,21",
+                "Portland COVID",
+                "17-18,22-23"
+        ));
+        populateTemplate(new Template(
+                "1-58",
+                "Portland Standard Template",
+                facilityIdPortland,
+                "1,9-10,21,30-31,34-35,43,54-55,58",
+                "Portland Standard",
+                "17-18,22-23,30-31,36-37,42,53-54,57-58"
         ));
 
         // Populate templates for facility "San Francisco"
