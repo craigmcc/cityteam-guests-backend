@@ -42,12 +42,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -416,11 +418,15 @@ public class FacilityEndpoints {
             @Parameter(description = "Facility ID for which to find guests.")
             @PathParam("facilityId") Long facilityId,
             @Parameter(description = "Name segment match for guests to find.")
-            @PathParam("name") String name
+            @PathParam("name") String name,
+            @Parameter(description = "Zero-relative index of first guest to return.")
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @Parameter(description = "Maximum number of results to return.")
+            @QueryParam("limit") @DefaultValue("25") Integer limit
     ) {
         try {
-            return Response.ok(guestService.findByName
-                    (facilityId, name)).build();
+            return Response.ok(guestService.findByNamePaginated
+                    (facilityId, name, offset, limit)).build();
         } catch (InternalServerError e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage())

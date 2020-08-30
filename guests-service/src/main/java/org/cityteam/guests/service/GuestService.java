@@ -168,6 +168,30 @@ public class GuestService extends ModelService<Guest> {
 
     }
 
+    public @NotNull List<Guest> findByNamePaginated
+            (@NotNull Long facilityId, @NotNull String name,
+             @NotNull Integer offset, @NotNull Integer limit)
+            throws InternalServerError {
+
+        try {
+
+            TypedQuery<Guest> query = entityManager.createNamedQuery
+                    (GUEST_NAME + ".findByName", Guest.class)
+                    .setParameter(FACILITY_ID_COLUMN, facilityId)
+                    .setParameter(NAME_COLUMN, name)
+                    .setFirstResult(offset)
+                    .setMaxResults(limit);
+            return query.getResultList();
+
+        } catch (Exception e) {
+            LOG.log(SEVERE,
+                    String.format("findByName(%d,%s): %s",
+                            facilityId, name, e.getMessage()), e);
+            throw new InternalServerError(e.getMessage(), e);
+        }
+
+    }
+
     public @NotNull Guest findByNameExact
             (@NotNull Long facilityId,
              @NotNull String firstName,
