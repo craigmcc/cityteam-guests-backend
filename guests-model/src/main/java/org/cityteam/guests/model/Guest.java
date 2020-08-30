@@ -94,11 +94,11 @@ import static org.craigmcc.library.model.Constants.ID_COLUMN;
                 query = "SELECT g FROM " + GUEST_NAME + " g " +
                         "WHERE g." + FACILITY_ID_COLUMN + " = :" +
                         FACILITY_ID_COLUMN + " AND (" +
-                        "(g." + FIRST_NAME_COLUMN +
-                        " LIKE LOWER(CONCAT('%',:" +
+                        "(LOWER(g." + FIRST_NAME_COLUMN +
+                        ") LIKE LOWER(CONCAT('%',:" +
                         NAME_COLUMN + ",'%'))) OR " +
-                        "(g." + LAST_NAME_COLUMN +
-                        " LIKE LOWER(CONCAT('%',:" +
+                        "(LOWER(g." + LAST_NAME_COLUMN +
+                        ") LIKE LOWER(CONCAT('%',:" +
                         NAME_COLUMN + ",'%')))) " +
                         "ORDER BY g." + FACILITY_ID_COLUMN + ", g." +
                         LAST_NAME_COLUMN + ", g." + FIRST_NAME_COLUMN
