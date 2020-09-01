@@ -37,8 +37,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.cityteam.guests.model.Constants.FACILITY_ID_COLUMN;
 import static org.cityteam.guests.model.Constants.FACILITY_NAME;
@@ -84,6 +86,9 @@ public class TemplateServiceTest extends AbstractServiceTest {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Inject
+    FacilityService facilityService;
 
     @Inject
     RegistrationService registrationService;
@@ -226,7 +231,9 @@ public class TemplateServiceTest extends AbstractServiceTest {
         assertThat(guests1.size(), is(equalTo(0)));
 
         // No guests for facilityId
-        Optional<Facility> facility = findFacilityByNameExact("Portland");
+        String name = "Facility " + LocalDateTime.now().toString();
+        facilityService.insert(newFacility(name));
+        Optional<Facility> facility = findFacilityByNameExact(name);
         assertThat(facility.isPresent(), is(true));
         List<Template> guests2 =
                 templateService.findByFacilityId(facility.get().getId());
@@ -652,6 +659,20 @@ public class TemplateServiceTest extends AbstractServiceTest {
                 (TEMPLATE_NAME + ".findByFacilityId", Template.class)
                 .setParameter(FACILITY_ID_COLUMN, facilityId)
                 .getResultList();
+    }
+
+    private Facility newFacility(String name) {
+        return new Facility(
+                true,
+                null,
+                null,
+                null,
+                null,
+                name,
+                null,
+                null,
+                null
+        );
     }
 
     private Template newTemplate(Long facilityId) {

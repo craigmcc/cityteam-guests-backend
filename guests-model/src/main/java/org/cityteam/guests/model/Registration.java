@@ -176,7 +176,7 @@ public class Registration extends Model<Registration> implements Constants {
     private String features;
 
     @ManyToOne(
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             optional = true
     )
     @JoinColumn(
@@ -350,8 +350,6 @@ public class Registration extends Model<Registration> implements Constants {
         this.features = sb.toString();
     }
 
-
-/*
     public Guest getGuest() {
         return guest;
     }
@@ -359,7 +357,6 @@ public class Registration extends Model<Registration> implements Constants {
     public void setGuest(Guest guest) {
         this.guest = guest;
     }
-*/
 
     public Long getGuestId() {
         return guestId;
